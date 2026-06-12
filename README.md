@@ -1,132 +1,105 @@
 # CC Router
 
-**一鍵部署 Claude Code 多模型路由器** — DeepSeek V4 Pro / Flash + MiniMax M3 無縫切換
+**One-command Claude Code multi-model router** — DeepSeek V4 Pro / Flash + MiniMax M3 + GLM-5.1 seamless switching
+
+[中文](README_ZH.md)
 
 ```
-┌─────────────┐     ┌──────────────────┐     ┌─────────────────────┐
-│  Claude Code │ ──▶ │  cc-proxy :3456  │ ──▶ │ api.minimax.io      │
-│  /model 選單 │     │  按 model 名路由  │     │ api.deepseek.com    │
-└─────────────┘     └──────────────────┘     └─────────────────────┘
+┌─────────────┐     ┌──────────────────┐     ┌──────────────────────────┐
+│  Claude Code │ ──▶ │  cc-proxy :3456  │ ──▶ │ api.minimax.io (MiniMax) │
+│  /model pick │     │  route by model  │     │ api.deepseek.com (DS)    │
+└─────────────┘     └──────────────────┘     │ api.z.ai (GLM)           │
+                                             └──────────────────────────┘
 ```
 
-## 快速開始
+## Quick Start
 
-### 1. 取得 API Keys
+### 1. Get API Keys
 
-- **MiniMax**: [platform.minimaxi.com](https://platform.minimaxi.com) → API Keys → Key 格式 `sk-cp-...`
-- **DeepSeek**: [platform.deepseek.com](https://platform.deepseek.com) → API Keys → Key 格式 `sk-...`
+| Provider | Get Key At | Key Format | Endpoint |
+|----------|-----------|------------|----------|
+| DeepSeek | [platform.deepseek.com](https://platform.deepseek.com) → API Keys | `sk-...` | `api.deepseek.com` |
+| MiniMax | [platform.minimaxi.com](https://platform.minimaxi.com) → API Keys | `sk-cp-...` | `api.minimax.io` ⚠️ |
+| GLM-5 (opt) | [open.bigmodel.cn](https://open.bigmodel.cn) → API Keys | `xxx.yyy` | `api.z.ai` (intl) |
 
-### 2. 下載 & 設定 Key
+> ⚠️ MiniMax MUST use `api.minimax.io` (international). `api.minimaxi.com` returns 401.
+
+### 2. Clone & Configure
 
 ```bash
-git clone https://github.com/YOUR_USER/cc-router.git
+git clone https://github.com/ai-caseylai/cc-router.git
 cd cc-router
 ```
 
-編輯 `setup.py` 頂部，填入你的 Keys：
+Edit `setup.py`:
 
 ```python
 MINIMAX_API_KEY = "sk-cp-YOUR_KEY"
 DEEPSEEK_API_KEY = "sk-YOUR_KEY"
+GLM_API_KEY = ""          # optional
 ```
 
-### 3. 一鍵部署
+### 3. Deploy
 
 ```bash
 python3 setup.py
 ```
 
-腳本會自動完成：
-1. 檢查環境
-2. 安裝 Claude Code（如未安裝）
-3. 部署 cc-proxy 路由器
-4. 配置 settings.json
-5. 安裝 cc-model 切換指令
-6. 啟動 proxy + 設定開機自啟
-7. 驗證三模型連線
+Auto-completes: env check → Claude Code install → proxy deploy → config → switcher → auto-start → connectivity test.
 
-### 4. 啟動 Claude Code
+### 4. Launch
 
 ```bash
 source ~/.zshrc
 claude
 ```
 
-## 使用方式
-
-### 終端切換模型
+## Usage
 
 ```bash
-cc-model pro        # 預設 DeepSeek Pro  + Haiku=MiniMax
-cc-model flash      # 預設 DeepSeek Flash + Haiku=MiniMax
-cc-model minimax    # 預設 MiniMax        + Haiku=DeepSeek Pro
-cc-model status     # 查看映射
+cc-model pro        # Default=DeepSeek Pro
+cc-model flash      # Default=DeepSeek Flash
+cc-model minimax    # Default=MiniMax M3
+cc-model glm        # Default=GLM-5.1
+cc-model status     # Show mapping
 ```
 
-### Claude Code 內切換
+In Claude Code: `/model` → Default ↔ Haiku.
 
-輸入 `/model`，方向鍵選 Default ↔ Haiku 動態切換。
+## Models
 
-## 架構
+| Model | ID | Provider | Endpoint |
+|-------|-----|----------|----------|
+| DeepSeek V4 Pro | `deepseek-v4-pro[1m]` | DeepSeek | `api.deepseek.com` |
+| DeepSeek Flash | `deepseek-v4-flash` | DeepSeek | `api.deepseek.com` |
+| MiniMax M3 | `MiniMax-M3` | MiniMax | `api.minimax.io` |
+| GLM-5.1 | `glm-5.1` | Zhipu AI | `api.z.ai` (intl) / `open.bigmodel.cn` (CN) |
 
-| 檔案 | 用途 |
-|------|------|
-| `setup.py` | 一鍵部署腳本 |
-| `~/Documents/minimax/cc-proxy.py` | 核心路由器（部署後） |
-| `~/Documents/minimax/cc-model.sh` | 模型切換指令（部署後） |
-| `~/.claude/settings.json` | Claude Code 設定（部署後） |
-| `~/Library/LaunchAgents/com.cc-proxy.plist` | macOS 開機自啟（部署後） |
+## Architecture
 
-## 支援模型
+| File | Purpose |
+|------|---------|
+| `setup.py` | One-click deploy |
+| `~/Documents/minimax/cc-proxy.py` | Router (deployed) |
+| `~/Documents/minimax/cc-model.sh` | Switcher CLI (deployed) |
+| `~/.claude/settings.json` | Claude Code config |
+| `~/Library/LaunchAgents/com.cc-proxy.plist` | macOS auto-start |
 
-| 模型 | 識別名 | Provider |
-|------|--------|----------|
-| DeepSeek V4 Pro | `deepseek-v4-pro[1m]` | DeepSeek |
-| DeepSeek Flash | `deepseek-v4-flash` | DeepSeek |
-| MiniMax M3 | `MiniMax-M3` | MiniMax |
-
-## 手動部署
-
-如果不跑 `setup.py`，也可以手動部署：
+## Verification
 
 ```bash
-# 1. 啟動 proxy
-python3 cc-proxy.py &
-
-# 2. 設定 alias
-echo "alias cc-model='bash ~/Documents/minimax/cc-model.sh'" >> ~/.zshrc
-
-# 3. 設定 launchd 自啟
-cp com.cc-proxy.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.cc-proxy.plist
-```
-
-## 驗證
-
-```bash
-# 健康檢查
 curl http://127.0.0.1:3456/health
-# → {"status": "ok"}
-
-# 模型列表
 curl http://127.0.0.1:3456/v1/models
-# → MiniMax-M3, deepseek-v4-pro[1m], deepseek-v4-flash
-
-# Claude Code 內
-/status   # ANTHROPIC_BASE_URL → http://127.0.0.1:3456
-/model    # Default = deepseek-v4-pro[1m]
+# In Claude Code: /status → http://127.0.0.1:3456
 ```
 
-## 常見問題
+## FAQ
 
-**Q: MiniMax 回 401 invalid api key**
-→ Base URL 必須是 `api.minimax.io`（國際端點），**不是** `api.minimaxi.com`
+**MiniMax 401** → Use `api.minimax.io`, NOT `api.minimaxi.com`
 
-**Q: Claude Code 報 "model may not exist"**
-→ Proxy 沒啟動，執行 `python3 ~/Documents/minimax/cc-proxy.py &`
+**"model may not exist"** → Proxy down. `python3 ~/Documents/minimax/cc-proxy.py &`
 
-**Q: 想加入其他模型**
-→ 編輯 `cc-proxy.py` 的 `PROVIDERS` 字典，加入新 Provider
+**Add models** → Edit `cc-proxy.py` `PROVIDERS` dict.
 
 ## License
 
