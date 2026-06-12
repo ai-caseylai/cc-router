@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CC Router — Claude Code Multi-Model Router</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d2991d;
+    --red: #f85149;
+    --code-bg: #1c2128;
+    --max-w: 900px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0d2847 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 20px 48px;
+    text-align: center;
+  }
+  header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; }
+  header p { color: var(--muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+  .badge {
+    display: inline-block;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 4px;
+  }
+  .badge.green { border-color: var(--green); color: var(--green); }
+  .badge.blue { border-color: var(--accent); color: var(--accent); }
+  .badge.yellow { border-color: var(--yellow); color: var(--yellow); }
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex; gap: 20px; overflow-x: auto;
+    justify-content: center;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none;
+    font-size: 0.9rem; white-space: nowrap;
+    padding: 4px 8px; border-radius: 4px;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--text); background: var(--card); }
+  main { max-width: var(--max-w); margin: 0 auto; padding: 32px 20px 80px; }
+  section { margin-bottom: 48px; }
+  h2 {
+    font-size: 1.5rem; font-weight: 600;
+    padding-bottom: 10px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 1.15rem; margin: 24px 0 10px; }
+  p { margin-bottom: 12px; color: var(--text); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card h3 { margin-top: 0; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.88em;
+  }
+  :not(pre) > code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+  th, td {
+    text-align: left; padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    font-weight: 600; color: var(--muted);
+    font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .warn {
+    background: #2a1f0a;
+    border: 1px solid #5c4307;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.92rem;
+  }
+  .warn::before { content: '⚠️ '; }
+  .tip {
+    background: #0a1f2a;
+    border: 1px solid #075c3d;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.92rem;
+  }
+  .tip::before { content: '💡 '; }
+  .arch {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .arch .box {
+    display: inline-block;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 8px 16px;
+    margin: 4px 8px;
+  }
+  .arch .arrow { color: var(--muted); }
+  .arch .line { color: var(--muted); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  footer {
+    text-align: center; padding: 32px 20px;
+    color: var(--muted); font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ CC Router</h1>
+  <p>One‑command Claude Code multi‑model router — DeepSeek Pro / Flash + MiniMax M3 + GLM‑5.1, switch from <code>/model</code></p>
+  <div style="margin-top:18px">
+    <span class="badge blue">DeepSeek V4 Pro</span>
+    <span class="badge green">DeepSeek Flash</span>
+    <span class="badge yellow">MiniMax M3</span>
+    <span class="badge">GLM‑5.1</span>
+    <span class="badge">Claude Code</span>
+    <span class="badge green">macOS</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#architecture">Architecture</a>
+  <a href="#quickstart">Quick Start</a>
+  <a href="#keys">API Keys</a>
+  <a href="#endpoints">Endpoints</a>
+  <a href="#usage">Usage</a>
+  <a href="#troubleshooting">Troubleshooting</a>
+  <a href="#internals">Internals</a>
+  <a href="#gh">GitHub</a>
+</nav>
+
+<main>
+
+<!-- Architecture -->
+<section id="architecture">
+  <h2>📐 Architecture</h2>
+  <div class="arch">
+    <span class="box">Claude Code</span>
+    <span class="arrow">──▶</span>
+    <span class="box" style="border-color:var(--green)">cc‑proxy :3456</span>
+    <span class="arrow">──▶</span>
+    <span class="box">api.minimax.io</span><br>
+    <span class="line" style="margin-left:170px">├──▶</span>
+    <span class="box">api.deepseek.com</span><br>
+    <span class="line" style="margin-left:170px">└──▶</span>
+    <span class="box">api.z.ai</span>
+  </div>
+
+  <p>A lightweight Python proxy (<code>cc‑proxy.py</code>) sits between Claude Code and multiple LLM APIs. It parses the <code>model</code> field from each request and routes it to the matching provider — instant, zero-config switching.</p>
+
+  <div class="tip">Claude Code's <code>/model</code> picker shows <b>2 slots</b> (Default + Haiku). Use the <code>cc‑model</code> CLI to rotate which models fill those slots.</div>
+</section>
+
+<!-- Quick Start -->
+<section id="quickstart">
+  <h2>🚀 Quick Start</h2>
+
+  <h3>1. Get API Keys</h3>
+  <table>
+    <tr><th>Provider</th><th>Get Key At</th><th>Key Format</th></tr>
+    <tr><td>DeepSeek</td><td><a href="https://platform.deepseek.com" style="color:var(--accent)">platform.deepseek.com</a> → API Keys</td><td><code>sk-xxxxxxxx</code></td></tr>
+    <tr><td>MiniMax</td><td><a href="https://platform.minimaxi.com" style="color:var(--accent)">platform.minimaxi.com</a> → API Keys</td><td><code>sk-cp-xxxxxxxx</code></td></tr>
+    <tr><td>GLM‑5 (opt)</td><td><a href="https://open.bigmodel.cn" style="color:var(--accent)">open.bigmodel.cn</a> → API Keys</td><td><code>xxx.yyy</code></td></tr>
+  </table>
+
+  <h3>2. Clone & Configure</h3>
+  <pre>git clone https://github.com/ai-caseylai/cc-router.git
+cd cc-router
+# Edit setup.py — fill in your API keys</pre>
+
+  <h3>3. One‑Click Deploy</h3>
+  <pre>python3 setup.py</pre>
+  <p>Auto‑completes: env check → Claude Code install → proxy deploy → config → switcher CLI → macOS auto‑start → connectivity test.</p>
+
+  <h3>4. Launch</h3>
+  <pre>source ~/.zshrc
+claude</pre>
+</section>
+
+<!-- API Keys -->
+<section id="keys">
+  <h2>🔑 API Keys — Deep Dive</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>DeepSeek</h3>
+      <p>Register at <a href="https://platform.deepseek.com" style="color:var(--accent)">platform.deepseek.com</a>, top up, create an API key. One key serves both <code>deepseek-v4-pro[1m]</code> and <code>deepseek-v4-flash</code>.</p>
+      <p>Anthropic‑compatible endpoint: <code>https://api.deepseek.com/anthropic/v1/messages</code></p>
+    </div>
+    <div class="card">
+      <h3>MiniMax</h3>
+      <p>Register at <a href="https://platform.minimaxi.com" style="color:var(--accent)">platform.minimaxi.com</a>. Keys start with <code>sk-cp-</code>.</p>
+      <div class="warn" style="margin-top:10px;margin-bottom:0">
+        Must use <b>api.minimax.io</b> (international). <code>api.minimaxi.com</code> returns <b>401 invalid api key</b>.
+      </div>
+    </div>
+    <div class="card">
+      <h3>GLM‑5.1 (Zhipu AI)</h3>
+      <p>Register at <a href="https://open.bigmodel.cn" style="color:var(--accent)">open.bigmodel.cn</a>. Key format: <code>xxx.yyy.zzz</code>.</p>
+      <p>International endpoint: <code>https://api.z.ai/api/anthropic/v1/messages</code></p>
+    </div>
+    <div class="card">
+      <h3>Key Storage</h3>
+      <p>API keys are stored in <code>~/Documents/minimax/cc‑proxy.py</code> (the generated router script). They are <b>not</b> in <code>settings.json</code> — the proxy handles all authentication internally.</p>
+      <p><code>ANTHROPIC_AUTH_TOKEN</code> in <code>settings.json</code> can be any dummy string.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Endpoints -->
+<section id="endpoints">
+  <h2>🌐 International Endpoints</h2>
+
+  <table>
+    <tr><th>Provider</th><th>International Endpoint</th><th>⚠️ Do NOT Use</th></tr>
+    <tr><td>DeepSeek</td><td><code>api.deepseek.com</code></td><td>—</td></tr>
+    <tr><td>MiniMax</td><td><code style="color:var(--green)">api.minimax.io</code></td><td><code style="color:var(--red)">api.minimaxi.com</code> (CN only → 401)</td></tr>
+    <tr><td>GLM‑5.1</td><td><code style="color:var(--green)">api.z.ai</code></td><td><code>open.bigmodel.cn</code> (CN only)</td></tr>
+  </table>
+
+  <div class="warn">
+    <strong>MiniMax is the biggest trap.</strong> Their docs show the CN endpoint, but non‑CN IPs get <b>401 invalid api key</b>. Always use <code>api.minimax.io</code>.
+  </div>
+
+  <h3>How Claude Code Connects</h3>
+  <pre>"ANTHROPIC_BASE_URL": "http://127.0.0.1:3456"   ← points to local proxy
+  "ANTHROPIC_AUTH_TOKEN": "dummy"                ← proxy handles real auth</pre>
+  <p>The proxy strips <code>?beta=true</code> query params and forwards to the correct upstream based on the <code>model</code> field in the request body.</p>
+</section>
+
+<!-- Usage -->
+<section id="usage">
+  <h2>🕹️ Usage</h2>
+
+  <h3>Terminal Switching</h3>
+  <pre>cc-model pro        # Default=DeepSeek V4 Pro  → Haiku=MiniMax M3
+cc-model flash      # Default=DeepSeek Flash   → Haiku=MiniMax M3
+cc-model minimax    # Default=MiniMax M3       → Haiku=DeepSeek Pro
+cc-model glm        # Default=GLM‑5.1          → Haiku=MiniMax M3
+cc-model status     # Show current mapping + proxy health</pre>
+
+  <h3>Inside Claude Code</h3>
+  <p>Type <code>/model</code> in the TUI. Arrow‑key between <strong>Default</strong> ↔ <strong>Haiku</strong> to switch instantly. No restart needed.</p>
+
+  <h3>The <code>cc-model</code> Alias</h3>
+  <p>Added to <code>~/.zshrc</code> during setup:</p>
+  <pre>alias cc-model='bash ~/Documents/minimax/cc-model.sh'</pre>
+
+  <h3>Verification</h3>
+  <pre># Proxy health
+curl http://127.0.0.1:3456/health      # → {"status":"ok"}
+
+# Model list
+curl http://127.0.0.1:3456/v1/models   # → MiniMax-M3, deepseek-v4-pro[1m], ...
+
+# In Claude Code
+/status   # ANTHROPIC_BASE_URL → http://127.0.0.1:3456
+/model    # Shows current mapping</pre>
+</section>
+
+<!-- Troubleshooting -->
+<section id="troubleshooting">
+  <h2>🩺 Troubleshooting</h2>
+
+  <div class="card">
+    <h3>❌ "model may not exist"</h3>
+    <p><strong>Cause:</strong> Proxy is not running (or the <code>?beta=true</code> query param was rejected by early proxy versions).</p>
+    <pre># Check
+curl http://127.0.0.1:3456/health
+
+# Restart
+lsof -ti :3456 | xargs kill
+python3 ~/Documents/minimax/cc-proxy.py &</pre>
+  </div>
+
+  <div class="card">
+    <h3>❌ MiniMax 401 · invalid api key</h3>
+    <p><strong>Three possible causes:</strong></p>
+    <ol style="margin-left:20px;color:var(--text)">
+      <li>Using <code>api.minimaxi.com</code> instead of <code>api.minimax.io</code></li>
+      <li>API key expired on MiniMax platform</li>
+      <li>Key truncated or malformed (starts with <code>sk-cp-</code>)</li>
+    </ol>
+    <p>Test directly:</p>
+    <pre>curl -s https://api.minimax.io/anthropic/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: sk-cp-YOUR_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{"model":"MiniMax-M3","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}'</pre>
+  </div>
+
+  <div class="card">
+    <h3>❌ API Timeout · Retrying</h3>
+    <p><strong>Cause:</strong> <code>ANTHROPIC_BASE_URL</code> pointing to a dead endpoint. Common when:</p>
+    <ul style="margin-left:20px;color:var(--text)">
+      <li><code>~/.zshrc</code> has <code>export ANTHROPIC_BASE_URL=...</code> overriding settings.json</li>
+      <li>Proxy not running on port 3456</li>
+      <li>Port mismatch (settings.json has 3457 but proxy is on 3456)</li>
+    </ul>
+    <pre># Check for env var conflicts
+grep ANTHROPIC ~/.zshrc
+
+# Comment them out
+sed -i '' 's/^export ANTHROPIC_/# export ANTHROPIC_/' ~/.zshrc</pre>
+  </div>
+
+  <div class="card">
+    <h3>❌ launchd "Operation not permitted"</h3>
+    <p>macOS privacy restriction. Fix: <strong>System Settings → Privacy & Security → Full Disk Access</strong> → add <code>/usr/bin/python3</code>.</p>
+    <p>Or use <code>/usr/local/bin/python3</code> in the plist instead.</p>
+  </div>
+
+  <div class="card">
+    <h3>❌ Config conflict: env vars vs settings.json</h3>
+    <p><strong>Priority order:</strong></p>
+    <pre>1. ~/.zshrc export ANTHROPIC_*    ← HIGHEST (overrides everything)
+2. ~/.claude/settings.json env    ← MIDDLE
+3. ~/.claude.json                 ← LOWEST</pre>
+    <p>If you set <code>ANTHROPIC_BASE_URL</code> in both <code>.zshrc</code> and <code>settings.json</code>, the <code>.zshrc</code> value wins.</p>
+  </div>
+</section>
+
+<!-- Internals -->
+<section id="internals">
+  <h2>🔧 Internals</h2>
+
+  <h3>File Map</h3>
+  <table>
+    <tr><th>File</th><th>Role</th></tr>
+    <tr><td><code>~/Documents/minimax/cc-proxy.py</code></td><td>Core router — HTTP proxy on :3456, routes by model name</td></tr>
+    <tr><td><code>~/Documents/minimax/cc-model.sh</code></td><td>Switcher CLI — updates settings.json model mapping</td></tr>
+    <tr><td><code>~/.claude/settings.json</code></td><td>Claude Code config — points to proxy, sets model slots</td></tr>
+    <tr><td><code>~/.claude.json</code></td><td>Onboarding flag — must have <code>"hasCompletedOnboarding": true</code></td></tr>
+    <tr><td><code>~/Library/LaunchAgents/com.cc-proxy.plist</code></td><td>macOS launchd — auto‑starts proxy on boot</td></tr>
+  </table>
+
+  <h3>settings.json Structure</h3>
+  <pre>{
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
+    "ANTHROPIC_AUTH_TOKEN": "dummy",
+    "ANTHROPIC_MODEL": "deepseek-v4-pro[1m]",          ← Default slot
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M3",      ← Haiku slot
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-v4-pro[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-v4-pro[1m]",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "512000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "model": "deepseek-v4-pro[1m]",
+  "availableModels": [
+    "MiniMax-M3",
+    "deepseek-v4-pro[1m]",
+    "deepseek-v4-flash"
+  ]
+}</pre>
+
+  <h3>Why Only 2 Slots in /model?</h3>
+  <p>Claude Code's <code>/model</code> picker shows <strong>Default</strong> (ANTHROPIC_MODEL) + <strong>Haiku</strong> (ANTHROPIC_DEFAULT_HAIKU_MODEL) + the current custom model. Opus and Sonnet aliases exist but are <em>not rendered</em> in the non‑Anthropic provider UI.</p>
+  <p>The <code>cc-model</code> script rotates the third/fourth models into these two visible slots as needed.</p>
+
+  <h3>Streaming Support</h3>
+  <p>The proxy handles SSE streaming natively — reads chunks from the upstream response and forwards them immediately. Claude Code's <code>?beta=true</code> query parameter is stripped before path matching.</p>
+
+  <h3>macOS Auto‑Start</h3>
+  <p>A <code>launchd</code> plist at <code>~/Library/LaunchAgents/com.cc-proxy.plist</code> ensures the proxy survives reboots. Loaded with <code>launchctl load</code>, kept alive with <code>KeepAlive</code>.</p>
+</section>
+
+<!-- GitHub -->
+<section id="gh">
+  <h2>📦 GitHub</h2>
+  <p><a href="https://github.com/ai-caseylai/cc-router" style="color:var(--accent);font-size:1.1rem">github.com/ai-caseylai/cc-router</a></p>
+  <p>Stars ⭐ welcome! PRs for new LLM providers, Linux/Windows support, and model‑based routing improvements.</p>
+
+  <div style="display:flex;gap:12px;margin-top:12px">
+    <span class="badge blue">Python 3</span>
+    <span class="badge green">MIT License</span>
+    <span class="badge">Public Repo</span>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>CC Router · <a href="https://github.com/ai-caseylai/cc-router">GitHub</a> · Built with Claude Code + MiniMax M3 + DeepSeek</p>
+</footer>
+
+</body>
+</html>
