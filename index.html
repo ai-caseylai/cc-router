@@ -5,1098 +5,540 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CC Router Wiki</title>
 <style>
-  :root {
-    --bg: #0d1117;
-    --sidebar: #0f131a;
-    --card: #161b22;
-    --border: #30363d;
-    --text: #c9d1d9;
-    --muted: #8b949e;
-    --accent: #58a6ff;
-    --green: #3fb950;
-    --yellow: #d2991d;
-    --red: #f85149;
-    --code-bg: #1c2128;
-    --sidebar-w: 260px;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.65;
-    display: flex;
-    min-height: 100vh;
-  }
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;--red:#f85149;--code-bg:#1c2128;--sw:255px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;display:flex;min-height:100vh}
+#sidebar{width:var(--sw);min-width:var(--sw);background:#0f131a;border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;padding:20px 0;z-index:10;display:flex;flex-direction:column}
+.sb-h{padding:0 18px 14px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.sb-h h1{font-size:1.1rem;font-weight:700}.sb-h p{font-size:.75rem;color:var(--muted)}
+#search{display:block;width:calc(100% - 32px);margin:10px 16px;padding:7px 10px;background:var(--code-bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.82rem;outline:none}
+#search:focus{border-color:var(--accent)}
+.ng{padding:2px 0}.ng-title{padding:5px 18px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);cursor:pointer;user-select:none;display:flex;justify-content:space-between}
+.ng-title::after{content:'▾';font-size:.6rem;transition:transform .15s}
+.ng.collapsed .ng-title::after{transform:rotate(-90deg)}
+.ng.collapsed .ng-links{display:none}
+.ng-links{list-style:none}.ng-links li a{display:block;padding:4px 18px 4px 24px;font-size:.82rem;color:var(--text);text-decoration:none;border-left:2px solid transparent;transition:background .1s,border-color .1s}
+.ng-links li a:hover{background:var(--card)}.ng-links li a.active{border-left-color:var(--accent);color:var(--accent);background:rgba(88,166,255,.07)}
+.badge{display:inline-block;font-size:.62rem;padding:1px 5px;border-radius:8px;margin-left:4px;vertical-align:middle;background:rgba(63,185,80,.15);color:var(--green)}
+.sb-footer{margin-top:auto;padding:12px 18px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted)}
+.sb-footer a{color:var(--accent)}
+main{flex:1;min-width:0;padding:28px 36px 60px;max-width:880px}
+.page{display:none}.page.active{display:block}
+.bc{font-size:.78rem;color:var(--muted);margin-bottom:20px}.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--accent)}
+h2{font-size:1.5rem;font-weight:700;margin-bottom:6px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+h3{font-size:1.1rem;margin:24px 0 8px;font-weight:600}h4{font-size:.95rem;margin:18px 0 6px;color:var(--accent)}
+p{margin-bottom:10px}a{color:var(--accent)}
+table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:.87rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)}
+th{font-weight:600;color:var(--muted);font-size:.77rem;text-transform:uppercase;letter-spacing:.4px}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:5px;padding:12px 16px;overflow-x:auto;font-family:'SF Mono','Fira Code',monospace;font-size:.83rem;line-height:1.5;margin-bottom:14px}
+code{font-family:'SF Mono','Fira Code',monospace;font-size:.86em}:not(pre)>code{background:var(--code-bg);padding:1px 5px;border-radius:3px;border:1px solid var(--border)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:16px 20px;margin-bottom:12px}.card h3,.card h4{margin-top:0}
+.warn,.tip,.info{border-radius:5px;padding:10px 14px;margin-bottom:14px;font-size:.87rem}
+.warn{background:#2a1f0a;border:1px solid #5c4307}.warn::before{content:'⚠️ '}
+.tip{background:#0a1f2a;border:1px solid #075c3d}.tip::before{content:'💡 '}
+.info{background:#0a1628;border:1px solid #1a4488}.info::before{content:'ℹ️ '}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.arch{background:var(--code-bg);border:1px solid var(--border);border-radius:7px;padding:18px;text-align:center;font-family:monospace;font-size:.83rem;line-height:1.8;margin-bottom:14px}
+.arch .bx{display:inline-block;background:var(--card);border:1px solid var(--accent);border-radius:4px;padding:5px 12px;margin:2px 5px}
+.arch .bx.g{border-color:var(--green)}.arch .bx.y{border-color:#d2991d}.arch .m{color:var(--muted)}
+.tag{display:inline-block;font-size:.7rem;padding:1px 7px;border-radius:9px;margin-right:3px}
+.tag.a{background:rgba(88,166,255,.1);color:var(--accent);border:1px solid var(--accent)}
+.tag.w{background:rgba(248,81,73,.1);color:var(--red);border:1px solid var(--red)}
+.tag.g{background:rgba(63,185,80,.1);color:var(--green);border:1px solid var(--green)}
 
-  /* ── Sidebar ── */
-  nav#sidebar {
-    width: var(--sidebar-w);
-    min-width: var(--sidebar-w);
-    background: var(--sidebar);
-    border-right: 1px solid var(--border);
-    position: sticky; top: 0; height: 100vh;
-    overflow-y: auto;
-    padding: 20px 0;
-    z-index: 10;
-    display: flex; flex-direction: column;
-  }
-  .sidebar-header {
-    padding: 0 20px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px;
-  }
-  .sidebar-header h1 { font-size: 1.15rem; font-weight: 700; }
-  .sidebar-header p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-  #sidebar-search {
-    margin: 12px 16px;
-    padding: 8px 12px;
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-size: 0.85rem;
-    outline: none;
-    width: calc(100% - 32px);
-  }
-  #sidebar-search:focus { border-color: var(--accent); }
-  .nav-group { padding: 4px 0; }
-  .nav-group-title {
-    padding: 6px 20px; font-size: 0.75rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted);
-    cursor: pointer; user-select: none;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .nav-group-title:hover { color: var(--text); }
-  .nav-group-title::after { content: '▾'; font-size: 0.65rem; transition: transform 0.15s; }
-  .nav-group.collapsed .nav-group-title::after { transform: rotate(-90deg); }
-  .nav-group.collapsed .nav-links { display: none; }
-  .nav-links { list-style: none; }
-  .nav-links li a {
-    display: block; padding: 5px 20px 5px 28px; font-size: 0.85rem;
-    color: var(--text); text-decoration: none; border-left: 2px solid transparent;
-    transition: background 0.12s, border-color 0.12s;
-  }
-  .nav-links li a:hover { background: var(--card); }
-  .nav-links li a.active { border-left-color: var(--accent); color: var(--accent); background: rgba(88,166,255,0.08); }
-  .nav-links li a .badge {
-    display: inline-block; font-size: 0.65rem; padding: 1px 6px; border-radius: 8px;
-    margin-left: 6px; vertical-align: middle;
-    background: rgba(63,185,80,0.15); color: var(--green);
-  }
-  .sidebar-footer {
-    margin-top: auto; padding: 14px 20px; border-top: 1px solid var(--border);
-    font-size: 0.75rem; color: var(--muted);
-  }
-  .sidebar-footer a { color: var(--accent); }
+/* Edit/Login toolbar */
+#toolbar{position:fixed;top:0;right:0;z-index:30;padding:8px 14px;display:flex;gap:8px;align-items:center}
+#toolbar button{background:var(--card);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:5px;cursor:pointer;font-size:.8rem}
+#toolbar button:hover{background:var(--border)}
+#toolbar button.editing{background:rgba(63,185,80,.15);border-color:var(--green);color:var(--green)}
+#edit-indicator{display:none;font-size:.78rem;color:var(--green)}
+#edit-indicator.show{display:inline}
+.edit-btn{display:none;float:right;font-size:.78rem;color:var(--muted);cursor:pointer;background:none;border:1px solid var(--border);border-radius:4px;padding:2px 8px;margin-left:10px}
+.edit-btn.show{display:inline-block}.edit-btn:hover{color:var(--accent);border-color:var(--accent)}
+#login-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:50;justify-content:center;align-items:center}
+#login-modal.open{display:flex}
+#login-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:28px;width:320px;text-align:center}
+#login-box h3{margin-bottom:16px}#login-box input{width:100%;padding:8px 12px;background:var(--code-bg);border:1px solid var(--border);border-radius:5px;color:var(--text);margin-bottom:12px;font-size:.9rem}
+#login-box button{background:var(--accent);border:none;color:#fff;padding:8px 20px;border-radius:5px;cursor:pointer;font-size:.9rem}
+#login-box .err{color:var(--red);font-size:.8rem;margin-top:8px}
+#new-page-btn{display:none}.new-page.show{display:inline-block}
+.new-page-form{display:none;margin-top:16px}.new-page-form.open{display:block}
+.new-page-form input{width:100%;padding:6px 10px;background:var(--code-bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:.85rem;margin-bottom:8px}
+.new-page-form textarea{width:100%;height:120px;padding:8px 10px;background:var(--code-bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:.85rem;resize:vertical;font-family:monospace;margin-bottom:8px}
+.new-page-form .btns{display:flex;gap:8px}
+.new-page-form .btns button{background:var(--accent);border:none;color:#fff;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:.82rem}
 
-  /* ── Main ── */
-  main {
-    flex: 1; min-width: 0; padding: 32px 40px 80px; max-width: 900px;
-  }
-  .page { display: none; }
-  .page.active { display: block; }
-  .breadcrumb {
-    font-size: 0.8rem; color: var(--muted); margin-bottom: 24px;
-  }
-  .breadcrumb a { color: var(--muted); text-decoration: none; }
-  .breadcrumb a:hover { color: var(--accent); }
-  h2 {
-    font-size: 1.6rem; font-weight: 700; margin-bottom: 8px;
-    padding-bottom: 12px; border-bottom: 1px solid var(--border);
-  }
-  h3 { font-size: 1.15rem; margin: 28px 0 10px; font-weight: 600; }
-  h4 { font-size: 1rem; margin: 20px 0 8px; color: var(--accent); }
-  p { margin-bottom: 12px; }
-  a { color: var(--accent); }
-
-  table {
-    width: 100%; border-collapse: collapse; margin-bottom: 16px;
-    font-size: 0.9rem;
-  }
-  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  th { font-weight: 600; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
-
-  pre {
-    background: var(--code-bg); border: 1px solid var(--border);
-    border-radius: 6px; padding: 14px 18px; overflow-x: auto;
-    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem;
-    line-height: 1.55; margin-bottom: 16px;
-  }
-  code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.88em; }
-  :not(pre) > code {
-    background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border);
-  }
-
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 18px 22px; margin-bottom: 14px;
-  }
-  .card h3, .card h4 { margin-top: 0; }
-  .warn, .tip, .info {
-    border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.9rem;
-  }
-  .warn { background: #2a1f0a; border: 1px solid #5c4307; }
-  .warn::before { content: '⚠️ '; }
-  .tip { background: #0a1f2a; border: 1px solid #075c3d; }
-  .tip::before { content: '💡 '; }
-  .info { background: #0a1628; border: 1px solid #1a4488; }
-  .info::before { content: 'ℹ️ '; }
-
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  @media (max-width: 720px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
-
-  .arch {
-    background: var(--code-bg); border: 1px solid var(--border);
-    border-radius: 8px; padding: 20px; text-align: center;
-    font-family: monospace; font-size: 0.85rem; line-height: 1.9; margin-bottom: 16px;
-  }
-  .arch .box { display: inline-block; background: var(--card); border: 1px solid var(--accent); border-radius: 5px; padding: 6px 14px; margin: 3px 6px; }
-  .arch .box.g { border-color: var(--green); }
-  .arch .box.y { border-color: var(--yellow); }
-  .arch .arrow { color: var(--muted); }
-  .arch .pipe { color: var(--muted); }
-
-  .toc { list-style: none; margin-bottom: 24px; }
-  .toc li { padding: 3px 0; }
-  .toc li a { font-size: 0.92rem; }
-
-  .tag {
-    display: inline-block; font-size: 0.72rem; padding: 1px 8px; border-radius: 10px;
-    margin-right: 4px; border: 1px solid;
-  }
-  .tag.api { background: rgba(88,166,255,0.1); border-color: var(--accent); color: var(--accent); }
-  .tag.warn { background: rgba(248,81,73,0.1); border-color: var(--red); color: var(--red); }
-  .tag.ok { background: rgba(63,185,80,0.1); border-color: var(--green); color: var(--green); }
-
-  .search-highlight { background: rgba(210,153,29,0.3); border-radius: 2px; }
-
-  /* ── Mobile toggle ── */
-  #menu-toggle {
-    display: none; position: fixed; top: 12px; left: 12px; z-index: 20;
-    background: var(--card); border: 1px solid var(--border);
-    color: var(--text); font-size: 1.3rem; padding: 6px 10px; border-radius: 6px;
-    cursor: pointer;
-  }
-  @media (max-width: 768px) {
-    #menu-toggle { display: block; }
-    nav#sidebar {
-      position: fixed; left: -280px; transition: left 0.25s; width: 260px; min-width: 260px;
-    }
-    nav#sidebar.open { left: 0; }
-    main { padding: 20px 16px 60px; }
-  }
+@media(max-width:768px){
+  body{flex-direction:column}
+  #sidebar{width:100%;min-width:100%;height:auto;position:static;border-right:none;border-bottom:1px solid var(--border)}
+  main{padding:18px 14px}
+  .grid{grid-template-columns:1fr}
+  #toolbar{top:4px;right:4px}
+}
 </style>
 </head>
 <body>
 
-<button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+<!-- Toolbar: login / edit -->
+<div id="toolbar">
+  <span id="edit-indicator">✏️ Edit mode</span>
+  <button id="btn-login" onclick="toggleLogin()">🔒 Login</button>
+  <button id="btn-new" class="new-page" onclick="toggleNewPage()">+ New Page</button>
+</div>
 
-<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<!-- Login modal -->
+<div id="login-modal">
+  <div id="login-box">
+    <h3>🔐 Authorized Access</h3>
+    <input type="password" id="login-pass" placeholder="Wiki password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Login</button>
+    <div class="err" id="login-err"></div>
+    <p style="margin-top:14px;font-size:.75rem;color:var(--muted)">Editing pages requires a GitHub account.<br>The wiki password unlocks edit buttons.</p>
+  </div>
+</div>
+
+<!-- ═══ SIDEBAR ═══ -->
 <nav id="sidebar">
-  <div class="sidebar-header">
-    <h1>⚡ CC Router Wiki</h1>
-    <p>Claude Code Multi-Model Router</p>
-  </div>
-
-  <input type="text" id="sidebar-search" placeholder="Search wiki…" oninput="searchWiki(this.value)">
-
-  <div class="nav-group" id="nav-getting-started">
-    <div class="nav-group-title" onclick="this.parentElement.classList.toggle('collapsed')">Getting Started</div>
-    <ul class="nav-links">
-      <li><a href="#home" class="active" onclick="showPage('home')">🏠 Home</a></li>
-      <li><a href="#quickstart" onclick="showPage('quickstart')">🚀 Quick Start</a></li>
-      <li><a href="#install" onclick="showPage('install')">📦 Installation</a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group" id="nav-providers">
-    <div class="nav-group-title" onclick="this.parentElement.classList.toggle('collapsed')">Providers</div>
-    <ul class="nav-links">
-      <li><a href="#provider-deepseek" onclick="showPage('provider-deepseek')">DeepSeek</a></li>
-      <li><a href="#provider-minimax" onclick="showPage('provider-minimax')">MiniMax M3 <span class="badge">⚠️</span></a></li>
-      <li><a href="#provider-glm" onclick="showPage('provider-glm')">GLM-5.1</a></li>
-      <li><a href="#endpoints" onclick="showPage('endpoints')">🌐 International Endpoints</a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group" id="nav-usage">
-    <div class="nav-group-title" onclick="this.parentElement.classList.toggle('collapsed')">Usage</div>
-    <ul class="nav-links">
-      <li><a href="#usage-switching" onclick="showPage('usage-switching')">🕹️ Model Switching</a></li>
-      <li><a href="#usage-ccmodel" onclick="showPage('usage-ccmodel')">cc-model CLI</a></li>
-      <li><a href="#usage-model-picker" onclick="showPage('usage-model-picker')">/model Picker</a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group" id="nav-internals">
-    <div class="nav-group-title" onclick="this.parentElement.classList.toggle('collapsed')">Internals</div>
-    <ul class="nav-links">
-      <li><a href="#internals-arch" onclick="showPage('internals-arch')">🔧 Architecture</a></li>
-      <li><a href="#internals-files" onclick="showPage('internals-files')">📁 File Map</a></li>
-      <li><a href="#internals-settings" onclick="showPage('internals-settings')">settings.json</a></li>
-      <li><a href="#internals-proxy" onclick="showPage('internals-proxy')">cc-proxy.py</a></li>
-      <li><a href="#internals-streaming" onclick="showPage('internals-streaming')">Streaming</a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group" id="nav-troubleshooting">
-    <div class="nav-group-title" onclick="this.parentElement.classList.toggle('collapsed')">Troubleshooting</div>
-    <ul class="nav-links">
-      <li><a href="#trouble-model-not-exist" onclick="showPage('trouble-model-not-exist')">"model may not exist"</a></li>
-      <li><a href="#trouble-401" onclick="showPage('trouble-401')">MiniMax 401</a></li>
-      <li><a href="#trouble-timeout" onclick="showPage('trouble-timeout')">API Timeout</a></li>
-      <li><a href="#trouble-env-conflict" onclick="showPage('trouble-env-conflict')">Env Var Conflicts</a></li>
-      <li><a href="#trouble-launchd" onclick="showPage('trouble-launchd')">launchd Permissions</a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group" id="nav-reference">
-    <div class="nav-group-title" onclick="this.parentElement.classList.toggle('collapsed')">Reference</div>
-    <ul class="nav-links">
-      <li><a href="#ref-commands" onclick="showPage('ref-commands')">📋 Command Cheatsheet</a></li>
-      <li><a href="#ref-links" onclick="showPage('ref-links')">🔗 Links</a></li>
-    </ul>
-  </div>
-
-  <div class="sidebar-footer">
-    <a href="https://github.com/ai-caseylai/cc-router">GitHub</a> · MIT
-  </div>
+  <div class="sb-h"><h1>⚡ CC Router Wiki</h1><p>Claude Code Multi-Model Router</p></div>
+  <input type="text" id="search" placeholder="Search wiki…" oninput="searchWiki(this.value)">
+  <div class="ng"><div class="ng-title" onclick="this.parentElement.classList.toggle('collapsed')">Getting Started</div>
+    <ul class="ng-links"><li><a href="#home" class="active" onclick="navTo('home')">🏠 Home</a></li>
+    <li><a href="#quickstart" onclick="navTo('quickstart')">🚀 Quick Start</a></li>
+    <li><a href="#install" onclick="navTo('install')">📦 Installation</a></li></ul></div>
+  <div class="ng"><div class="ng-title" onclick="this.parentElement.classList.toggle('collapsed')">Providers</div>
+    <ul class="ng-links"><li><a href="#deepseek" onclick="navTo('deepseek')">DeepSeek</a></li>
+    <li><a href="#minimax" onclick="navTo('minimax')">MiniMax M3 <span class="badge" style="background:rgba(248,81,73,.15);color:var(--red)">⚠️</span></a></li>
+    <li><a href="#glm" onclick="navTo('glm')">GLM-5.1</a></li>
+    <li><a href="#endpoints" onclick="navTo('endpoints')">🌐 International Endpoints</a></li></ul></div>
+  <div class="ng"><div class="ng-title" onclick="this.parentElement.classList.toggle('collapsed')">Usage</div>
+    <ul class="ng-links"><li><a href="#usage" onclick="navTo('usage')">🕹️ Model Switching</a></li>
+    <li><a href="#ccmodel" onclick="navTo('ccmodel')">cc-model CLI</a></li></ul></div>
+  <div class="ng"><div class="ng-title" onclick="this.parentElement.classList.toggle('collapsed')">Internals</div>
+    <ul class="ng-links"><li><a href="#arch" onclick="navTo('arch')">🔧 Architecture</a></li>
+    <li><a href="#files" onclick="navTo('files')">📁 File Map</a></li>
+    <li><a href="#settings" onclick="navTo('settings')">settings.json</a></li>
+    <li><a href="#streaming" onclick="navTo('streaming')">Streaming</a></li></ul></div>
+  <div class="ng"><div class="ng-title" onclick="this.parentElement.classList.toggle('collapsed')">Troubleshooting</div>
+    <ul class="ng-links"><li><a href="#t404" onclick="navTo('t404')">"model may not exist"</a></li>
+    <li><a href="#t401" onclick="navTo('t401')">MiniMax 401</a></li>
+    <li><a href="#ttimeout" onclick="navTo('ttimeout')">API Timeout</a></li>
+    <li><a href="#tenv" onclick="navTo('tenv')">Env Var Conflicts</a></li>
+    <li><a href="#tlaunch" onclick="navTo('tlaunch')">launchd Permissions</a></li></ul></div>
+  <div class="ng"><div class="ng-title" onclick="this.parentElement.classList.toggle('collapsed')">Reference</div>
+    <ul class="ng-links"><li><a href="#cheatsheet" onclick="navTo('cheatsheet')">📋 Cheatsheet</a></li>
+    <li><a href="#links" onclick="navTo('links')">🔗 Links</a></li></ul></div>
+  <div class="sb-footer"><a href="https://github.com/ai-caseylai/cc-router">GitHub</a> · MIT · <a href="https://housekeeping.techforliving.net">housekeeping.techforliving.net</a></div>
 </nav>
 
-<!-- ═══════════════ MAIN ═══════════════ -->
+<!-- ═══ MAIN ═══ -->
 <main id="content">
 
-<!-- ──────── HOME ──────── -->
-<article class="page active" id="page-home">
+<!-- HOME -->
+<article class="page active" id="page-home"><div id="edit-home" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
 <h2>⚡ CC Router Wiki</h2>
-<p>Welcome to the <strong>CC Router Wiki</strong> — the complete knowledge base for running Claude Code with multiple LLM backends: <span class="tag api">DeepSeek V4 Pro</span> <span class="tag api">DeepSeek Flash</span> <span class="tag api">MiniMax M3</span> <span class="tag api">GLM‑5.1</span></p>
-
+<div class="bc"><a href="#home">Home</a></div>
+<p>Welcome to the <strong>CC Router Wiki</strong> — the complete knowledge base for running Claude Code with multiple LLM backends: <span class="tag a">DeepSeek V4 Pro</span> <span class="tag a">DeepSeek Flash</span> <span class="tag a">MiniMax M3</span> <span class="tag a">GLM‑5.1</span></p>
 <div class="arch">
-  <span class="box">Claude Code</span>
-  <span class="arrow">──▶</span>
-  <span class="box g">cc‑proxy :3456</span>
-  <span class="arrow">──▶</span>
-  <span class="box y">api.minimax.io</span><br>
-  <span class="pipe" style="margin-left:170px">├──▶</span>
-  <span class="box">api.deepseek.com</span><br>
-  <span class="pipe" style="margin-left:170px">└──▶</span>
-  <span class="box">api.z.ai</span>
+  <span class="bx">Claude Code</span> <span class="m">──▶</span> <span class="bx g">cc‑proxy :3456</span> <span class="m">──▶</span> <span class="bx y">api.minimax.io</span><br>
+  <span class="m" style="margin-left:170px">├──▶</span> <span class="bx">api.deepseek.com</span><br>
+  <span class="m" style="margin-left:170px">└──▶</span> <span class="bx">api.z.ai</span>
 </div>
-
-<h3>What is CC Router?</h3>
-<p>A lightweight Python proxy + CLI toolset that lets Claude Code seamlessly switch between DeepSeek, MiniMax, and GLM models via the built‑in <code>/model</code> picker. One‑command setup, instant switching, no config editing.</p>
-
-<div class="grid">
-  <div class="card"><h4>🔄 Dynamic Switching</h4><p>Change models with <code>/model</code> inside Claude Code or <code>cc-model</code> from terminal. No restart needed.</p></div>
-  <div class="card"><h4>⚡ One‑Click Deploy</h4><p><code>python3 setup.py</code> handles everything: proxy, config, auto‑start, verification.</p></div>
-  <div class="card"><h4>🌐 International Endpoints</h4><p>Pre‑configured with <code>api.minimax.io</code>, <code>api.z.ai</code> — no 401 traps.</p></div>
-  <div class="card"><h4>📦 4 LLMs</h4><p>DeepSeek Pro, Flash, MiniMax M3, GLM‑5.1 — all accessible from one Claude Code instance.</p></div>
-</div>
-
-<div class="info" style="margin-top:20px">
-  <strong>New here?</strong> Start with <a href="#quickstart" onclick="showPage('quickstart')">Quick Start</a> or jump to <a href="#install" onclick="showPage('install')">Installation</a>.
-</div>
+<div class="grid"><div class="card"><h4>🔄 Dynamic Switching</h4><p>Change models with <code>/model</code> inside Claude Code or <code>cc-model</code> from terminal.</p></div>
+<div class="card"><h4>⚡ One‑Click Deploy</h4><p><code>python3 setup.py</code> does everything: proxy, config, auto‑start, verification.</p></div>
+<div class="card"><h4>🌐 International Endpoints</h4><p>Pre‑configured with <code>api.minimax.io</code>, <code>api.z.ai</code> — no 401 traps.</p></div>
+<div class="card"><h4>📦 4 LLMs</h4><p>DeepSeek Pro, Flash, MiniMax M3, GLM‑5.1 from one Claude Code instance.</p></div></div>
+<div class="info" style="margin-top:18px"><strong>New here?</strong> Start with <a href="#quickstart" onclick="navTo('quickstart')">Quick Start</a>.</div>
 </article>
 
-<!-- ──────── QUICKSTART ──────── -->
-<article class="page" id="page-quickstart">
-<h2>🚀 Quick Start</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Quick Start</div>
-
+<!-- QUICKSTART -->
+<article class="page" id="page-quickstart"><div id="edit-quickstart" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>🚀 Quick Start</h2><div class="bc"><a href="#home">Home</a> / Quick Start</div>
 <h3>1. Get API Keys</h3>
-<table>
-  <tr><th>Provider</th><th>Get Key At</th><th>Key Format</th></tr>
-  <tr><td>DeepSeek</td><td><a href="https://platform.deepseek.com">platform.deepseek.com</a> → API Keys</td><td><code>sk-xxxxxxxx</code></td></tr>
-  <tr><td>MiniMax</td><td><a href="https://platform.minimaxi.com">platform.minimaxi.com</a> → API Keys</td><td><code>sk-cp-xxxxxxxx</code></td></tr>
-  <tr><td>GLM‑5 (opt)</td><td><a href="https://open.bigmodel.cn">open.bigmodel.cn</a> → API Keys</td><td><code>xxx.yyy</code></td></tr>
-</table>
-
+<table><tr><th>Provider</th><th>Get Key At</th><th>Key Format</th></tr>
+<tr><td>DeepSeek</td><td><a href="https://platform.deepseek.com">platform.deepseek.com</a> → API Keys</td><td><code>sk-xxxxxxxx</code></td></tr>
+<tr><td>MiniMax</td><td><a href="https://platform.minimaxi.com">platform.minimaxi.com</a> → API Keys</td><td><code>sk-cp-xxxxxxxx</code></td></tr>
+<tr><td>GLM‑5 (opt)</td><td><a href="https://open.bigmodel.cn">open.bigmodel.cn</a> → API Keys</td><td><code>xxx.yyy</code></td></tr></table>
 <h3>2. Clone & Configure</h3>
 <pre>git clone https://github.com/ai-caseylai/cc-router.git
 cd cc-router
 # Edit setup.py — fill in your API keys</pre>
-
 <h3>3. One‑Click Deploy</h3>
 <pre>python3 setup.py</pre>
-<p>Auto‑completes: env check → Claude Code install → proxy deploy → config → switcher CLI → macOS auto‑start → connectivity test.</p>
-
 <h3>4. Launch</h3>
-<pre>source ~/.zshrc
-claude</pre>
-
-<div class="tip">Mac only. Linux/Windows: deploy manually — see <a href="#install" onclick="showPage('install')">Installation</a>.</div>
+<pre>source ~/.zshrc && claude</pre>
 </article>
 
-<!-- ──────── INSTALL ──────── -->
-<article class="page" id="page-install">
-<h2>📦 Installation</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Installation</div>
-
+<!-- INSTALL -->
+<article class="page" id="page-install"><div id="edit-install" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>📦 Installation</h2><div class="bc"><a href="#home">Home</a> / Installation</div>
 <h3>Prerequisites</h3>
-<ul style="margin-left:20px;margin-bottom:16px">
-  <li>macOS 12+ (Linux/Windows: manual steps)</li>
-  <li>Python 3 (built‑in)</li>
-  <li>Claude Code (auto‑installed if missing)</li>
-</ul>
+<ul style="margin-left:20px;margin-bottom:14px"><li>macOS 12+ (Linux/Windows: manual)</li><li>Python 3</li><li>Claude Code (auto‑installed)</li></ul>
+<h3>Automatic (macOS)</h3><pre>python3 setup.py</pre>
+<h3>Manual</h3>
+<pre># 1. Start proxy
+python3 ~/Documents/minimax/cc-proxy.py &
 
-<h3>Automatic (macOS)</h3>
-<pre>python3 setup.py</pre>
+# 2. Configure settings.json
+# → See "settings.json" page for full config
 
-<h3>Manual Deployment</h3>
-<h4>Step 1: Create cc‑proxy</h4>
-<pre>mkdir -p ~/Documents/minimax</pre>
-<p>Copy <code>cc-proxy.py</code> from the repo, fill in your API keys.</p>
-
-<h4>Step 2: Configure settings.json</h4>
-<pre>{
-  "env": {
-    "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
-    "ANTHROPIC_AUTH_TOKEN": "dummy",
-    "ANTHROPIC_MODEL": "deepseek-v4-pro[1m]",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M3",
-    "API_TIMEOUT_MS": "3000000",
-    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "512000",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
-  }
-}</pre>
-
-<h4>Step 3: Start proxy</h4>
-<pre>python3 ~/Documents/minimax/cc-proxy.py &</pre>
-
-<h4>Step 4: Add cc‑model alias</h4>
-<pre>echo "alias cc-model='bash ~/Documents/minimax/cc-model.sh'" >> ~/.zshrc</pre>
-
-<h4>Step 5: macOS auto‑start (optional)</h4>
-<p>Create <code>~/Library/LaunchAgents/com.cc-proxy.plist</code> — see <a href="#trouble-launchd" onclick="showPage('trouble-launchd')">launchd guide</a>.</p>
-
-<h3>Verify Installation</h3>
+# 3. Add alias
+echo "alias cc-model='bash ~/Documents/minimax/cc-model.sh'" >> ~/.zshrc</pre>
+<h3>Verify</h3>
 <pre>curl http://127.0.0.1:3456/health     # → {"status":"ok"}
-curl http://127.0.0.1:3456/v1/models  # → list of 3-4 models
 claude                                 # /status → http://127.0.0.1:3456</pre>
 </article>
 
-<!-- ──────── PROVIDER: DEEPSEEK ──────── -->
-<article class="page" id="page-provider-deepseek">
-<h2>DeepSeek</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Providers / DeepSeek</div>
-
-<h3>Overview</h3>
-<p>DeepSeek provides two models through a single Anthropic‑compatible endpoint. One API key covers both.</p>
-
-<table>
-  <tr><th>Model</th><th>ID</th><th>Use Case</th></tr>
-  <tr><td>DeepSeek V4 Pro</td><td><code>deepseek-v4-pro[1m]</code></td><td>Heavy coding, reasoning, long context (1M)</td></tr>
-  <tr><td>DeepSeek Flash</td><td><code>deepseek-v4-flash</code></td><td>Quick answers, background tasks</td></tr>
-</table>
-
-<h3>Endpoint</h3>
-<pre>https://api.deepseek.com/anthropic/v1/messages</pre>
-
-<h3>API Key</h3>
-<ol style="margin-left:20px">
-  <li>Register at <a href="https://platform.deepseek.com">platform.deepseek.com</a></li>
-  <li>Top up credits</li>
-  <li>Create API key → format: <code>sk-xxxxxxxx</code></li>
-</ol>
-
-<h3>Proxy Config</h3>
-<pre>"deepseek-v4-pro[1m]": {
-    "url": "https://api.deepseek.com/anthropic/v1/messages",
-    "key": "sk-YOUR_KEY",
-},
-"deepseek-v4-flash": {
-    "url": "https://api.deepseek.com/anthropic/v1/messages",
-    "key": "sk-YOUR_KEY",
-}</pre>
-
-<h3>Model Aliases</h3>
-<p>DeepSeek's Anthropic endpoint also accepts these aliases (auto‑mapped by proxy):</p>
-<table>
-  <tr><th>Alias</th><th>Maps To</th></tr>
-  <tr><td><code>deepseek-chat</code></td><td><code>deepseek-v4-flash</code></td></tr>
-  <tr><td><code>deepseek-reasoner</code></td><td><code>deepseek-v4-pro[1m]</code></td></tr>
-</table>
+<!-- DEEPSEEK -->
+<article class="page" id="page-deepseek"><div id="edit-deepseek" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>DeepSeek</h2><div class="bc"><a href="#home">Home</a> / Providers / DeepSeek</div>
+<table><tr><th>Model</th><th>ID</th><th>Use Case</th></tr>
+<tr><td>DeepSeek V4 Pro</td><td><code>deepseek-v4-pro[1m]</code></td><td>Heavy coding, reasoning, 1M context</td></tr>
+<tr><td>DeepSeek Flash</td><td><code>deepseek-v4-flash</code></td><td>Quick answers, background tasks</td></tr></table>
+<h3>Endpoint</h3><pre>https://api.deepseek.com/anthropic/v1/messages</pre>
+<h3>API Key</h3><p>Register at <a href="https://platform.deepseek.com">platform.deepseek.com</a>, top up, create key → <code>sk-xxxxxxxx</code>. One key serves both models.</p>
+<h3>Aliases</h3>
+<table><tr><th>Alias</th><th>Maps To</th></tr><tr><td><code>deepseek-chat</code></td><td><code>deepseek-v4-flash</code></td></tr><tr><td><code>deepseek-reasoner</code></td><td><code>deepseek-v4-pro[1m]</code></td></tr></table>
 </article>
 
-<!-- ──────── PROVIDER: MINIMAX ──────── -->
-<article class="page" id="page-provider-minimax">
-<h2>MiniMax M3 <span class="tag warn">⚠️ tricky</span></h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Providers / MiniMax M3</div>
-
-<h3>Overview</h3>
-<p>MiniMax M3 is a strong coding model with extended thinking support. <strong>Critical: it requires the international endpoint.</strong></p>
-
-<table>
-  <tr><th>Model</th><th>ID</th><th>Key Prefix</th></tr>
-  <tr><td>MiniMax M3</td><td><code>MiniMax-M3</code></td><td><code>sk-cp-</code></td></tr>
-</table>
-
-<div class="warn">
-  <strong>Biggest trap:</strong> Their docs show the CN endpoint <code>api.minimaxi.com</code> which returns <b>401 invalid api key</b> for non‑CN users. Always use <code>api.minimax.io</code>.
-</div>
-
+<!-- MINIMAX -->
+<article class="page" id="page-minimax"><div id="edit-minimax" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>MiniMax M3 <span class="tag w">⚠️ tricky</span></h2><div class="bc"><a href="#home">Home</a> / Providers / MiniMax M3</div>
+<div class="warn"><strong>Biggest trap:</strong> Their docs show <code>api.minimaxi.com</code> which returns <b>401 invalid api key</b> for non‑CN users. Always use <code>api.minimax.io</code>.</div>
+<table><tr><th>Model</th><th>ID</th><th>Key Prefix</th><th>Auth Header</th></tr>
+<tr><td>MiniMax M3</td><td><code>MiniMax-M3</code></td><td><code>sk-cp-</code></td><td><code>x-api-key</code></td></tr></table>
 <h3>Correct Endpoint</h3>
 <pre>https://api.minimax.io/anthropic/v1/messages   ← ✅ International
 https://api.minimaxi.com/anthropic/v1/messages  ← ❌ CN only → 401</pre>
-
-<h3>API Key</h3>
-<ol style="margin-left:20px">
-  <li>Register at <a href="https://platform.minimaxi.com">platform.minimaxi.com</a></li>
-  <li>Create API key → format: <code>sk-cp-xxxxxxxx</code></li>
-  <li>Auth header: <code>x-api-key</code> (Claude Code sends as <code>ANTHROPIC_AUTH_TOKEN</code>)</li>
-</ol>
-
 <h3>Test Connectivity</h3>
 <pre>curl -s https://api.minimax.io/anthropic/v1/messages \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-cp-YOUR_KEY" \
   -H "anthropic-version: 2023-06-01" \
-  -d '{"model":"MiniMax-M3","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}'
-
-# Expected: {"type":"message","role":"assistant","model":"MiniMax-M3",...}</pre>
-
-<h3>Features</h3>
-<ul style="margin-left:20px">
-  <li>Extended Thinking (default ON in Claude Code — toggle with Option+T / Alt+T)</li>
-  <li>Context window: 512K → set <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW: "512000"</code></li>
-</ul>
+  -d '{"model":"MiniMax-M3","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}'</pre>
+<h3>Features</h3><ul style="margin-left:20px"><li>Extended Thinking (toggle: Option+T / Alt+T in Claude Code)</li><li>Context: 512K → set <code>CLAUDE_CODE_AUTO_COMPACT_WINDOW: "512000"</code></li></ul>
 </article>
 
-<!-- ──────── PROVIDER: GLM ──────── -->
-<article class="page" id="page-provider-glm">
-<h2>GLM‑5.1 (Zhipu AI)</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Providers / GLM‑5.1</div>
-
-<h3>Overview</h3>
-<p>GLM‑5.1 is Zhipu AI's flagship coding model. Optional — leave <code>GLM_API_KEY</code> empty in <code>setup.py</code> if not needed.</p>
-
-<table>
-  <tr><th>Model</th><th>ID</th><th>Key Format</th></tr>
-  <tr><td>GLM‑5.1</td><td><code>glm-5.1</code></td><td><code>xxx.yyy.zzz</code> (dot‑separated)</td></tr>
-</table>
-
+<!-- GLM -->
+<article class="page" id="page-glm"><div id="edit-glm" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>GLM‑5.1 (Zhipu AI)</h2><div class="bc"><a href="#home">Home</a> / Providers / GLM‑5.1</div>
+<table><tr><th>Model</th><th>ID</th><th>Key Format</th></tr><tr><td>GLM‑5.1</td><td><code>glm-5.1</code></td><td><code>xxx.yyy.zzz</code></td></tr></table>
 <h3>Endpoints</h3>
-<table>
-  <tr><th>Region</th><th>Endpoint</th></tr>
-  <tr><td>International</td><td><code>https://api.z.ai/api/anthropic/v1/messages</code></td></tr>
-  <tr><td>China</td><td><code>https://open.bigmodel.cn/api/anthropic/v1/messages</code></td></tr>
-</table>
-
-<h3>API Key</h3>
-<ol style="margin-left:20px">
-  <li>Register at <a href="https://open.bigmodel.cn">open.bigmodel.cn</a></li>
-  <li>Create API key</li>
-</ol>
-
-<h3>Proxy Config</h3>
-<pre>"glm-5.1": {
-    "url": "https://api.z.ai/api/anthropic/v1/messages",
-    "key": "your-glm-key.xxx.yyy",
-}</pre>
+<table><tr><th>Region</th><th>Endpoint</th></tr><tr><td>International</td><td><code>https://api.z.ai/api/anthropic/v1/messages</code></td></tr><tr><td>China</td><td><code>https://open.bigmodel.cn/api/anthropic/v1/messages</code></td></tr></table>
+<h3>API Key</h3><p>Register at <a href="https://open.bigmodel.cn">open.bigmodel.cn</a>, create key.</p>
 </article>
 
-<!-- ──────── ENDPOINTS ──────── -->
-<article class="page" id="page-endpoints">
-<h2>🌐 International Endpoints</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Providers / Endpoints</div>
-
-<table>
-  <tr><th>Provider</th><th>✅ International</th><th>❌ Do NOT Use</th></tr>
-  <tr><td>DeepSeek</td><td><code>api.deepseek.com</code></td><td>—</td></tr>
-  <tr><td>MiniMax</td><td><code style="color:var(--green)">api.minimax.io</code></td><td><code style="color:var(--red)">api.minimaxi.com</code> → 401</td></tr>
-  <tr><td>GLM‑5.1</td><td><code style="color:var(--green)">api.z.ai</code></td><td><code>open.bigmodel.cn</code> (CN only)</td></tr>
-</table>
-
-<div class="warn"><strong>MiniMax is the #1 trap.</strong> Their own docs reference the CN endpoint. Non‑CN IPs get 401. Double‑check your <code>cc-proxy.py</code> uses <code>api.minimax.io</code>.</div>
-
-<h3>How cc‑proxy Routes</h3>
-<pre>Claude Code → POST /v1/messages?beta=true {"model":"MiniMax-M3",...}
-                                    ↓
-cc-proxy strips ?beta=true, reads model field
-                                    ↓
-model=MiniMax-M3     → https://api.minimax.io/anthropic/v1/messages
-model=deepseek-v4... → https://api.deepseek.com/anthropic/v1/messages
-model=glm-5.1        → https://api.z.ai/api/anthropic/v1/messages</pre>
+<!-- ENDPOINTS -->
+<article class="page" id="page-endpoints"><div id="edit-endpoints" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>🌐 International Endpoints</h2><div class="bc"><a href="#home">Home</a> / Providers / Endpoints</div>
+<table><tr><th>Provider</th><th>✅ International</th><th>❌ Do NOT Use</th></tr>
+<tr><td>DeepSeek</td><td><code>api.deepseek.com</code></td><td>—</td></tr>
+<tr><td>MiniMax</td><td><code style="color:var(--green)">api.minimax.io</code></td><td><code style="color:var(--red)">api.minimaxi.com</code> → 401</td></tr>
+<tr><td>GLM‑5.1</td><td><code style="color:var(--green)">api.z.ai</code></td><td><code>open.bigmodel.cn</code> (CN only)</td></tr></table>
+<h3>How Claude Code Connects</h3><pre>"ANTHROPIC_BASE_URL": "http://127.0.0.1:3456"   ← local proxy
+"ANTHROPIC_AUTH_TOKEN": "dummy"                ← proxy handles real auth</pre>
+<p>The proxy strips <code>?beta=true</code> query params and routes by <code>model</code> field.</p>
 </article>
 
-<!-- ──────── USAGE: SWITCHING ──────── -->
-<article class="page" id="page-usage-switching">
-<h2>🕹️ Model Switching</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Usage / Switching</div>
-
-<h3>Two Ways to Switch</h3>
-
-<div class="grid">
-  <div class="card">
-    <h4>Terminal: <code>cc-model</code></h4>
-    <p>Changes the Default + Haiku mapping. Best for setting up your preferred model pair.</p>
-    <pre>cc-model pro      # DeepSeek Pro + MiniMax
-cc-model flash    # DeepSeek Flash + MiniMax
-cc-model minimax  # MiniMax + DeepSeek Pro
-cc-model glm      # GLM‑5.1 + MiniMax</pre>
-  </div>
-  <div class="card">
-    <h4>Claude Code: <code>/model</code></h4>
-    <p>Instant toggle between the two slots. No restart.</p>
-    <pre>/model → arrow keys
-Default ↔ Haiku</pre>
-  </div>
-</div>
-
-<div class="info">
-  <strong>Why only 2 slots?</strong> Claude Code's <code>/model</code> picker shows Default + Haiku for non‑Anthropic providers. Use <code>cc-model</code> to rotate the 3rd/4th models into these slots.
-</div>
-
-<h3>Typical Workflow</h3>
-<ol style="margin-left:20px">
-  <li>Start with <code>cc-model pro</code> (DeepSeek Pro default)</li>
-  <li>Open Claude Code, type <code>/model</code> → see Default=DeepSeek Pro, Haiku=MiniMax</li>
-  <li>Toggle with arrow keys as needed</li>
-  <li>Need Flash? <code>cc-model flash</code> in terminal, then <code>/model</code> again</li>
-</ol>
+<!-- USAGE -->
+<article class="page" id="page-usage"><div id="edit-usage" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>🕹️ Model Switching</h2><div class="bc"><a href="#home">Home</a> / Usage</div>
+<h3>Terminal</h3>
+<pre>cc-model pro        # Default=DeepSeek Pro  → Haiku=MiniMax
+cc-model flash      # Default=DeepSeek Flash → Haiku=MiniMax
+cc-model minimax    # Default=MiniMax       → Haiku=DeepSeek Pro
+cc-model glm        # Default=GLM‑5.1       → Haiku=MiniMax
+cc-model status     # Show mapping + proxy health</pre>
+<h3>Inside Claude Code</h3><p>Type <code>/model</code> → arrow keys → Default ↔ Haiku. No restart needed.</p>
+<div class="info"><strong>Why only 2 slots?</strong> Claude Code's <code>/model</code> picker only shows Default + Haiku + current custom model in non‑Anthropic mode. Use <code>cc-model</code> to rotate which models fill those slots.</div>
 </article>
 
-<!-- ──────── USAGE: CCMODEL ──────── -->
-<article class="page" id="page-usage-ccmodel">
-<h2>cc-model CLI</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Usage / cc-model CLI</div>
+<!-- CCMODEL -->
+<article class="page" id="page-ccmodel"><div id="edit-ccmodel" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>cc-model CLI</h2><div class="bc"><a href="#home">Home</a> / Usage / cc-model</div>
+<p>The <code>cc-model</code> command updates <code>~/.claude/settings.json</code> to remap which models appear in <code>/model</code>'s two slots.</p>
+<h3>Installation</h3><pre># Auto (setup.py)
+python3 setup.py
 
+# Manual
+echo "alias cc-model='bash ~/Documents/minimax/cc-model.sh'" >> ~/.zshrc</pre>
 <h3>Commands</h3>
-<table>
-  <tr><th>Command</th><th>Default Slot</th><th>Haiku Slot</th></tr>
-  <tr><td><code>cc-model pro</code></td><td>deepseek-v4-pro[1m]</td><td>MiniMax-M3</td></tr>
-  <tr><td><code>cc-model flash</code></td><td>deepseek-v4-flash</td><td>MiniMax-M3</td></tr>
-  <tr><td><code>cc-model minimax</code></td><td>MiniMax-M3</td><td>deepseek-v4-pro[1m]</td></tr>
-  <tr><td><code>cc-model glm</code></td><td>glm-5.1</td><td>MiniMax-M3</td></tr>
-  <tr><td><code>cc-model status</code></td><td colspan="2">Show current mapping + proxy health</td></tr>
-</table>
-
-<h3>Aliases</h3>
-<pre>cc-model deepseek  →  same as pro
-cc-model ds        →  same as pro
-cc-model fast      →  same as flash
-cc-model m3        →  same as minimax
-cc-model mm        →  same as minimax</pre>
-
-<h3>What It Does</h3>
-<p><code>cc-model</code> writes to <code>~/.claude/settings.json</code>, updating:</p>
-<pre>ANTHROPIC_MODEL              → Default slot
-ANTHROPIC_DEFAULT_HAIKU_MODEL → Haiku slot
-ANTHROPIC_DEFAULT_SONNET_MODEL → same as Default
-ANTHROPIC_DEFAULT_OPUS_MODEL   → same as Default
-model                        → same as Default</pre>
-
-<h3>Installation</h3>
-<p>Added automatically by <code>setup.py</code>. Or manually:</p>
-<pre>echo "alias cc-model='bash ~/Documents/minimax/cc-model.sh'" >> ~/.zshrc</pre>
+<table><tr><th>Command</th><th>Default Slot</th><th>Haiku Slot</th></tr>
+<tr><td><code>cc-model pro</code></td><td>deepseek-v4-pro[1m]</td><td>MiniMax-M3</td></tr>
+<tr><td><code>cc-model flash</code></td><td>deepseek-v4-flash</td><td>MiniMax-M3</td></tr>
+<tr><td><code>cc-model minimax</code></td><td>MiniMax-M3</td><td>deepseek-v4-pro[1m]</td></tr>
+<tr><td><code>cc-model glm</code></td><td>glm-5.1</td><td>MiniMax-M3</td></tr>
+<tr><td><code>cc-model status</code></td><td colspan="2">Show mapping + proxy health</td></tr></table>
 </article>
 
-<!-- ──────── USAGE: MODEL PICKER ──────── -->
-<article class="page" id="page-usage-model-picker">
-<h2>/model Picker</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Usage / /model Picker</div>
-
-<h3>What You See</h3>
-<p>When you type <code>/model</code> in Claude Code:</p>
-<pre>Select model
-  1. Default (recommended)  deepseek-v4-pro[1m]
-  2. Haiku                  MiniMax-M3
-❯ 3. deepseek-v4-pro[1m] ✔  Custom model</pre>
-
-<h3>How It Works</h3>
-<table>
-  <tr><th>Option</th><th>Reads From</th><th>Example</th></tr>
-  <tr><td>Default</td><td><code>ANTHROPIC_MODEL</code></td><td><code>deepseek-v4-pro[1m]</code></td></tr>
-  <tr><td>Haiku</td><td><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code></td><td><code>MiniMax-M3</code></td></tr>
-  <tr><td>Custom ✔</td><td>Current active model</td><td>Mirrors Default</td></tr>
-</table>
-
-<h3>Limitations</h3>
-<ul style="margin-left:20px">
-  <li>Only <strong>2 slots</strong> shown (Default + Haiku) for non‑Anthropic providers</li>
-  <li>Opus/Sonnet aliases exist in config but are <strong>not rendered</strong> in the TUI</li>
-  <li>Switching is instant — no restart required</li>
-  <li>Extended thinking: <code>Option+T</code> (macOS) / <code>Alt+T</code> (Win/Linux) toggles in picker</li>
-</ul>
-</article>
-
-<!-- ──────── INTERNALS: ARCHITECTURE ──────── -->
-<article class="page" id="page-internals-arch">
-<h2>🔧 Architecture</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Internals / Architecture</div>
-
-<div class="arch" style="text-align:left;padding:20px 30px">
-  <span style="color:var(--muted)">┌─────────────────────────────────────────────┐</span><br>
-  <span style="color:var(--muted)">│</span>  <span style="color:var(--accent)">Claude Code</span>                                 <span style="color:var(--muted)">│</span><br>
-  <span style="color:var(--muted)">│</span>  Reads ~/.claude/settings.json                <span style="color:var(--muted)">│</span><br>
-  <span style="color:var(--muted)">│</span>  Sends POST /v1/messages?beta=true            <span style="color:var(--muted)">│</span><br>
-  <span style="color:var(--muted)">└──────────────────┬──────────────────────────┘</span><br>
-  <span style="color:var(--muted)">                   │ http://127.0.0.1:3456</span><br>
-  <span style="color:var(--muted)">                   ▼</span><br>
-  <span style="color:var(--muted)">┌─────────────────────────────────────────────┐</span><br>
-  <span style="color:var(--muted)">│</span>  <span style="color:var(--green)">cc-proxy.py :3456</span>                            <span style="color:var(--muted)">│</span><br>
-  <span style="color:var(--muted)">│</span>  Parse model field → route to provider         <span style="color:var(--muted)">│</span><br>
-  <span style="color:var(--muted)">│</span>  Handle SSE streaming                          <span style="color:var(--muted)">│</span><br>
-  <span style="color:var(--muted)">│</span>  Strip ?beta=true query param                  <span style="color:var(--muted)">│</span><br>
-  <span style="color:var(--muted)">└────┬──────────────┬──────────────┬───────────┘</span><br>
-  <span style="color:var(--muted)">     │              │              │</span><br>
-  <span style="color:var(--muted)">     ▼              ▼              ▼</span><br>
-  <span class="box">api.deepseek</span>   <span class="box y">api.minimax</span>   <span class="box">api.z.ai</span><br>
-  <span style="color:var(--muted);font-size:0.78rem">DeepSeek Pro    MiniMax M3      GLM‑5.1</span><br>
-  <span style="color:var(--muted);font-size:0.78rem">DeepSeek Flash</span>
-</div>
-
+<!-- ARCH -->
+<article class="page" id="page-arch"><div id="edit-arch" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>🔧 Architecture</h2><div class="bc"><a href="#home">Home</a> / Internals / Architecture</div>
+<p>cc‑proxy is a <strong>single‑file Python HTTP server</strong> (~120 lines) using only <code>http.server</code> and <code>urllib.request</code> — zero dependencies.</p>
 <h3>Request Flow</h3>
-<ol style="margin-left:20px">
-  <li>Claude Code reads <code>settings.json</code> → <code>ANTHROPIC_BASE_URL = http://127.0.0.1:3456</code></li>
-  <li>User sends a message → Claude Code POSTs to proxy with <code>model</code> field from settings</li>
-  <li>Proxy parses <code>model</code>, looks up in <code>PROVIDERS</code> dict</li>
-  <li>Proxy forwards request to matching upstream API with the provider's real key</li>
-  <li>Response streamed back to Claude Code</li>
-</ol>
-
-<h3>Design Decisions</h3>
-<ul style="margin-left:20px">
-  <li><strong>No API keys in settings.json</strong> — proxy holds all keys internally</li>
-  <li><strong>Python stdlib only</strong> — zero dependencies, works on any macOS</li>
-  <li><strong>Single‑process</strong> — one <code>HTTPServer</code>, simple to debug</li>
-  <li><strong>Model‑based routing</strong> — the <code>model</code> field in the request body drives provider selection</li>
-</ul>
+<pre>1. Claude Code → POST /v1/messages?beta=true (model="MiniMax-M3")
+2. Proxy strips ?beta=true, reads model name
+3. Looks up PROVIDERS["MiniMax-M3"]
+4. Forwards to https://api.minimax.io/anthropic/v1/messages
+5. Streams response back (SSE supported)
+6. Claude Code receives response as if from Anthropic API</pre>
 </article>
 
-<!-- ──────── INTERNALS: FILE MAP ──────── -->
-<article class="page" id="page-internals-files">
-<h2>📁 File Map</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Internals / File Map</div>
-
-<table>
-  <tr><th>File</th><th>Role</th><th>Managed By</th></tr>
-  <tr><td><code>~/Documents/minimax/cc-proxy.py</code></td><td>Core HTTP router (:3456)</td><td>setup.py</td></tr>
-  <tr><td><code>~/Documents/minimax/cc-model.sh</code></td><td>Model switcher CLI</td><td>setup.py</td></tr>
-  <tr><td><code>~/Documents/minimax/cc-router/</code></td><td>Repo checkout</td><td>git clone</td></tr>
-  <tr><td><code>~/.claude/settings.json</code></td><td>Claude Code config</td><td>setup.py / cc-model</td></tr>
-  <tr><td><code>~/.claude.json</code></td><td>Onboarding flag</td><td>setup.py</td></tr>
-  <tr><td><code>~/Library/LaunchAgents/com.cc-proxy.plist</code></td><td>macOS auto‑start</td><td>setup.py</td></tr>
-  <tr><td><code>~/.zshrc</code></td><td>cc-model alias</td><td>setup.py</td></tr>
-  <tr><td><code>~/.cc-proxy.log</code></td><td>Proxy stdout/stderr</td><td>launchd</td></tr>
-</table>
-
-<h3>Repo Structure</h3>
-<pre>cc-router/
-├── README.md          # English docs
-├── README_ZH.md       # 中文文档
-├── setup.py           # One‑click deploy script
-├── SKILL.md           # Chinese agent skill
-├── SKILL_EN.md        # English agent skill
-├── index.html         # This wiki
-├── CNAME              # housekeeping.techforliving.net
-└── .gitignore</pre>
+<!-- FILES -->
+<article class="page" id="page-files"><div id="edit-files" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>📁 File Map</h2><div class="bc"><a href="#home">Home</a> / Internals / File Map</div>
+<table><tr><th>File</th><th>Role</th></tr>
+<tr><td><code>~/Documents/minimax/cc-proxy.py</code></td><td>Core router — HTTP proxy on :3456, routes by model name</td></tr>
+<tr><td><code>~/Documents/minimax/cc-model.sh</code></td><td>Switcher CLI — updates <code>settings.json</code> model mapping</td></tr>
+<tr><td><code>~/.claude/settings.json</code></td><td>Claude Code config — points to proxy, sets model slots</td></tr>
+<tr><td><code>~/.claude.json</code></td><td>Onboarding flag — must have <code>"hasCompletedOnboarding": true</code></td></tr>
+<tr><td><code>~/Library/LaunchAgents/com.cc-proxy.plist</code></td><td>macOS launchd — auto‑starts proxy on boot</td></tr></table>
 </article>
 
-<!-- ──────── INTERNALS: SETTINGS ──────── -->
-<article class="page" id="page-internals-settings">
-<h2>settings.json Reference</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Internals / settings.json</div>
-
-<h3>Complete Schema</h3>
+<!-- SETTINGS -->
+<article class="page" id="page-settings"><div id="edit-settings" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>settings.json</h2><div class="bc"><a href="#home">Home</a> / Internals / settings.json</div>
 <pre>{
   "env": {
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
     "ANTHROPIC_AUTH_TOKEN": "dummy",
-    "ANTHROPIC_MODEL": "deepseek-v4-pro[1m]",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M3",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-v4-pro[1m]",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-v4-pro[1m]",
+    "ANTHROPIC_MODEL": "deepseek-v4-pro[1m]",         ← Default slot
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M3",     ← Haiku slot
     "API_TIMEOUT_MS": "3000000",
     "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "512000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
   },
   "model": "deepseek-v4-pro[1m]",
-  "availableModels": [
-    "MiniMax-M3",
-    "deepseek-v4-pro[1m]",
-    "deepseek-v4-flash",
-    "glm-5.1"
-  ]
+  "availableModels": ["MiniMax-M3","deepseek-v4-pro[1m]","deepseek-v4-flash"]
 }</pre>
-
-<h3>Key Explanations</h3>
-<table>
-  <tr><th>Field</th><th>Purpose</th></tr>
-  <tr><td><code>ANTHROPIC_BASE_URL</code></td><td>Must point to proxy: <code>http://127.0.0.1:3456</code></td></tr>
-  <tr><td><code>ANTHROPIC_AUTH_TOKEN</code></td><td>Dummy value — proxy handles real auth</td></tr>
-  <tr><td><code>ANTHROPIC_MODEL</code></td><td>Default slot in /model picker</td></tr>
-  <tr><td><code>ANTHROPIC_DEFAULT_HAIKU_MODEL</code></td><td>Haiku slot in /model picker</td></tr>
-  <tr><td><code>API_TIMEOUT_MS</code></td><td>50 min timeout (safe for long generations)</td></tr>
-  <tr><td><code>CLAUDE_CODE_AUTO_COMPACT_WINDOW</code></td><td>512K matches MiniMax M3 context window</td></tr>
-  <tr><td><code>availableModels</code></td><td>Models listed in /model picker</td></tr>
-</table>
-
-<div class="warn">
-  <strong>Env var priority:</strong> <code>~/.zshrc</code> exports override <code>settings.json</code>. If you have <code>export ANTHROPIC_BASE_URL=...</code> in your shell config, the proxy will be bypassed.
-</div>
+<div class="warn"><strong>Env var priority:</strong> <code>~/.zshrc</code> exports > <code>settings.json</code> env. Always comment out <code>ANTHROPIC_*</code> in <code>.zshrc</code>.</div>
 </article>
 
-<!-- ──────── INTERNALS: PROXY ──────── -->
-<article class="page" id="page-internals-proxy">
-<h2>cc-proxy.py Internals</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Internals / cc-proxy.py</div>
+<!-- STREAMING -->
+<article class="page" id="page-streaming"><div id="edit-streaming" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>Streaming</h2><div class="bc"><a href="#home">Home</a> / Internals / Streaming</div>
+<p>The proxy supports both streaming (SSE) and non‑streaming responses:</p>
+<pre># Streaming (Claude Code default)
+req["stream"] = true   → proxy reads 4KB chunks, forwards immediately
 
-<h3>Endpoints</h3>
-<table>
-  <tr><th>Method</th><th>Path</th><th>Purpose</th></tr>
-  <tr><td>GET</td><td><code>/health</code></td><td>Health check → <code>{"status":"ok"}</code></td></tr>
-  <tr><td>GET</td><td><code>/v1/models</code></td><td>List available models</td></tr>
-  <tr><td>POST</td><td><code>/v1/messages*</code></td><td>Main API — forwards to upstream</td></tr>
-</table>
-
-<h3>Routing Logic</h3>
-<pre>def do_POST(self):
-    path = self.path.split("?")[0]   # Strip ?beta=true
-    model = req["model"]             # Read model from request body
-    provider = PROVIDERS[model]      # Look up upstream
-    # Forward to provider["url"] with provider["key"]</pre>
-
-<h3>Provider Config</h3>
-<pre>PROVIDERS = {
-    "MiniMax-M3": {
-        "url": "https://api.minimax.io/anthropic/v1/messages",
-        "key": "sk-cp-...",
-    },
-    "deepseek-v4-pro[1m]": {
-        "url": "https://api.deepseek.com/anthropic/v1/messages",
-        "key": "sk-...",
-    },
-    "deepseek-v4-flash": { ... },
-    "glm-5.1": {
-        "url": "https://api.z.ai/api/anthropic/v1/messages",
-        "key": "...",
-    },
-}</pre>
-
-<h3>Dependencies</h3>
-<p>Zero external dependencies. Uses only Python stdlib: <code>http.server</code>, <code>json</code>, <code>urllib.request</code>.</p>
+# Non‑streaming
+req["stream"] = false  → proxy reads entire response, sends at once</pre>
+<h3>Query Params</h3><p>Claude Code sends <code>POST /v1/messages?beta=true</code>. The proxy strips query params before path matching (<code>path.split("?")[0]</code>).</p>
+<div class="tip">Early proxy versions returned 404 because <code>self.path == "/v1/messages"</code> failed against <code>"/v1/messages?beta=true"</code>. Fixed in v2.</div>
 </article>
 
-<!-- ──────── INTERNALS: STREAMING ──────── -->
-<article class="page" id="page-internals-streaming">
-<h2>Streaming Support</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Internals / Streaming</div>
-
-<h3>How It Works</h3>
-<p>Claude Code sends <code>{"stream": true}</code> in requests. The proxy forwards this flag to the upstream API and then streams the response <strong>chunk‑by‑chunk</strong>:</p>
-
-<pre>def stream_response(resp, wfile):
-    while True:
-        chunk = resp.read(4096)
-        if not chunk: break
-        wfile.write(chunk)
-        wfile.flush()</pre>
-
-<h3>?beta=true Query Param</h3>
-<p>Claude Code v2.1.x appends <code>?beta=true</code> to <code>/v1/messages</code>. Early proxy versions did exact path matching and returned 404. Current version strips query params:</p>
-<pre>path = self.path.split("?")[0]   # "/v1/messages?beta=true" → "/v1/messages"</pre>
-
-<h3>Headers Passed Through</h3>
-<ul style="margin-left:20px">
-  <li><code>Content-Type</code></li>
-  <li><code>x-api-key</code> (or <code>Authorization</code>)</li>
-  <li><code>anthropic-version</code></li>
-  <li><code>Accept</code></li>
-  <li>All upstream response headers (except Transfer‑Encoding, Connection, Keep‑Alive)</li>
-</ul>
-</article>
-
-<!-- ──────── TROUBLE: MODEL NOT EXIST ──────── -->
-<article class="page" id="page-trouble-model-not-exist">
-<h2>"model may not exist" Error</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Troubleshooting / model may not exist</div>
-
-<h3>Symptoms</h3>
-<pre>⏺ There's an issue with the selected model (deepseek-v4-flash).
-   It may not exist or you may not have access to it.</pre>
-
-<h3>Root Causes</h3>
-<ol style="margin-left:20px">
-  <li><strong>Proxy not running</strong> — most common</li>
-  <li><strong>Proxy path matching bug</strong> — <code>?beta=true</code> rejected (fixed in current version)</li>
-  <li><strong><code>/v1/models</code> endpoint missing</strong> — Claude Code validates models before sending</li>
-</ol>
-
-<h3>Fix</h3>
-<pre># 1. Check if proxy is running
+<!-- TROUBLESHOOTING PAGES -->
+<article class="page" id="page-t404"><div id="edit-t404" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>"model may not exist"</h2><div class="bc"><a href="#home">Home</a> / Troubleshooting</div>
+<p><strong>Cause:</strong> Proxy not running, or Claude Code can't reach port 3456.</p>
+<pre># Check
 curl http://127.0.0.1:3456/health
-# Expected: {"status":"ok"}
 
-# 2. Check if /v1/models responds
-curl http://127.0.0.1:3456/v1/models
-# Expected: {"object":"list","data":[...]}
-
-# 3. Restart proxy if needed
+# Restart
 lsof -ti :3456 | xargs kill
-python3 ~/Documents/minimax/cc-proxy.py &
+python3 ~/Documents/minimax/cc-proxy.py &</pre>
+<p>Also check: <code>ANTHROPIC_BASE_URL</code> in settings.json must be <code>http://127.0.0.1:3456</code>.</p>
+</article>
 
-# 4. Verify the model works directly
-curl -s http://127.0.0.1:3456/v1/messages \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: x" \
+<article class="page" id="page-t401"><div id="edit-t401" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>MiniMax 401 · invalid api key</h2><div class="bc"><a href="#home">Home</a> / Troubleshooting / MiniMax 401</div>
+<p><strong>Three causes:</strong></p>
+<ol style="margin-left:20px;margin-bottom:14px">
+  <li>Using <code>api.minimaxi.com</code> instead of <code>api.minimax.io</code></li>
+  <li>API key expired on MiniMax platform</li>
+  <li>Key truncated or malformed (must start with <code>sk-cp-</code>)</li>
+</ol>
+<pre>curl -s https://api.minimax.io/anthropic/v1/messages \
+  -H "x-api-key: sk-cp-YOUR_KEY" \
+  -H "anthropic-version: 2023-06-01" \
   -d '{"model":"MiniMax-M3","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}'</pre>
 </article>
 
-<!-- ──────── TROUBLE: 401 ──────── -->
-<article class="page" id="page-trouble-401">
-<h2>MiniMax 401 · Invalid API Key</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Troubleshooting / MiniMax 401</div>
-
-<h3>Symptoms</h3>
-<pre>{"type":"error","error":{"type":"authentication_error","message":"invalid api key"}}</pre>
-
-<h3>Causes</h3>
-<table>
-  <tr><th>#</th><th>Cause</th><th>Fix</th></tr>
-  <tr><td>1</td><td>Using <code>api.minimaxi.com</code> instead of <code>api.minimax.io</code></td><td>Change endpoint in cc-proxy.py</td></tr>
-  <tr><td>2</td><td>API key expired on MiniMax platform</td><td>Regenerate key at platform.minimaxi.com</td></tr>
-  <tr><td>3</td><td>Key truncated or malformed</td><td>Must start with <code>sk-cp-</code></td></tr>
-</table>
-
-<h3>Quick Test</h3>
-<pre>curl -s -w "\nHTTP: %{http_code}" \
-  https://api.minimax.io/anthropic/v1/messages \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: sk-cp-YOUR_KEY" \
-  -H "anthropic-version: 2023-06-01" \
-  -d '{"model":"MiniMax-M3","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}'
-
-# 200 → key is valid, check proxy config
-# 401 → key is invalid, regenerate</pre>
-
-<div class="tip">You can also test with <code>Authorization: Bearer</code> header — MiniMax accepts both <code>x-api-key</code> and <code>Bearer</code>.</div>
-</article>
-
-<!-- ──────── TROUBLE: TIMEOUT ──────── -->
-<article class="page" id="page-trouble-timeout">
-<h2>API Timeout · Retrying</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Troubleshooting / Timeout</div>
-
-<h3>Symptoms</h3>
-<pre>Retrying in 0s · attempt 4/10 · API_TIMEOUT_MS=3000000ms, try increasing it</pre>
-
-<h3>Causes</h3>
-<ol style="margin-left:20px">
-  <li><strong>Wrong <code>ANTHROPIC_BASE_URL</code></strong> — pointing to a dead or wrong endpoint</li>
-  <li><strong>Proxy not running</strong> — port 3456 has no listener</li>
-  <li><strong>Port mismatch</strong> — settings.json has 3457 but proxy is on 3456</li>
-  <li><strong>Env var override</strong> — <code>~/.zshrc</code> exports overriding settings.json</li>
-</ol>
-
-<h3>Fix</h3>
-<pre># Check current endpoint
-grep ANTHROPIC_BASE_URL ~/.claude/settings.json
-# Should be: "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456"
-
-# Check for env var overrides
+<article class="page" id="page-ttimeout"><div id="edit-ttimeout" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>API Timeout · Retrying</h2><div class="bc"><a href="#home">Home</a> / Troubleshooting / API Timeout</div>
+<p><strong>Cause:</strong> <code>ANTHROPIC_BASE_URL</code> pointing to dead endpoint or wrong port.</p>
+<p>Common causes:</p>
+<ul style="margin-left:20px;margin-bottom:14px">
+  <li><code>~/.zshrc</code> has <code>export ANTHROPIC_BASE_URL=...</code> overriding settings.json</li>
+  <li>Proxy not running on port 3456</li>
+  <li>Port mismatch (settings.json has 3457 but proxy is on 3456)</li>
+</ul>
+<pre># Check for conflicts
 grep ANTHROPIC ~/.zshrc
-# If any uncommented export lines exist → comment them out
-
-# Check proxy is running on correct port
-lsof -i :3456
-# Should show python3 listening
-
-# In Claude Code
-/status   # Verify ANTHROPIC_BASE_URL</pre>
+# Comment them out
+sed -i '' 's/^export ANTHROPIC_/# export ANTHROPIC_/' ~/.zshrc</pre>
 </article>
 
-<!-- ──────── TROUBLE: ENV CONFLICT ──────── -->
-<article class="page" id="page-trouble-env-conflict">
-<h2>Environment Variable Conflicts</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Troubleshooting / Env Var Conflicts</div>
-
-<h3>Priority Order</h3>
-<pre>🥇 ~/.zshrc export ANTHROPIC_*      ← HIGHEST
-🥈 ~/.claude/settings.json env
-🥉 ~/.claude.json</pre>
-
-<h3>Common Scenario</h3>
-<p>You have both:</p>
-<pre># In ~/.zshrc
-export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-
-# In ~/.claude/settings.json
-"ANTHROPIC_BASE_URL": "http://127.0.0.1:3456"</pre>
-<p>→ <strong>Result:</strong> Claude Code uses <code>api.deepseek.com</code> directly, bypassing the proxy entirely.</p>
-
-<h3>Fix</h3>
-<pre># Comment out ALL ANTHROPIC_* lines in ~/.zshrc
-sed -i '' 's/^export ANTHROPIC_/# export ANTHROPIC_/' ~/.zshrc
-
-# Open a new terminal (or source ~/.zshrc) for changes to take effect</pre>
-
-<h3>Also Check</h3>
-<p>Some tools auto‑inject env vars:</p>
-<ul style="margin-left:20px">
-  <li><code>ccr activate</code> (claude-code-router) — may set ANTHROPIC_BASE_URL</li>
-  <li>SkillHub CLI — may inject DeepSeek env vars</li>
-  <li>WorkBuddy — may inject its own ANTHROPIC config</li>
-</ul>
-<p>Check the bottom of <code>~/.zshrc</code> for auto‑injected blocks.</p>
+<article class="page" id="page-tenv"><div id="edit-tenv" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>Env Var Conflicts</h2><div class="bc"><a href="#home">Home</a> / Troubleshooting / Env Var Conflicts</div>
+<p><strong>Priority order:</strong></p>
+<pre>1. ~/.zshrc export ANTHROPIC_*   ← HIGHEST (overrides everything)
+2. ~/.claude/settings.json env   ← MIDDLE
+3. ~/.claude.json                ← LOWEST</pre>
+<p>If both <code>.zshrc</code> and <code>settings.json</code> set the same variable, the <code>.zshrc</code> value wins.</p>
 </article>
 
-<!-- ──────── TROUBLE: LAUNCHD ──────── -->
-<article class="page" id="page-trouble-launchd">
-<h2>launchd "Operation not permitted"</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Troubleshooting / launchd</div>
-
-<h3>Symptoms</h3>
-<pre>/Applications/Xcode.app/Contents/Developer/usr/bin/python3:
-can't open file '/Users/perry/Documents/minimax/cc-proxy.py':
-[Errno 1] Operation not permitted</pre>
-
-<h3>Cause</h3>
-<p>macOS privacy restriction. The Python binary used by launchd doesn't have Full Disk Access to read files in <code>~/Documents/</code>.</p>
-
-<h3>Fix (Option 1 — Recommended)</h3>
-<p>Move <code>cc-proxy.py</code> to a system‑accessible location and update the plist:</p>
-<pre>sudo cp ~/Documents/minimax/cc-proxy.py /usr/local/bin/cc-proxy.py
-sudo chmod +x /usr/local/bin/cc-proxy.py</pre>
-<p>Then update the plist <code>ProgramArguments</code> to point to <code>/usr/local/bin/cc-proxy.py</code>.</p>
-
-<h3>Fix (Option 2)</h3>
-<p>Grant Full Disk Access to Python:
-<strong>System Settings → Privacy & Security → Full Disk Access</strong> → add <code>/usr/bin/python3</code>.</p>
-
-<h3>Fix (Option 3 — Use Homebrew Python)</h3>
-<pre>brew install python@3.12
-# Use /opt/homebrew/bin/python3 in the plist</pre>
+<article class="page" id="page-tlaunch"><div id="edit-tlaunch" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>launchd "Operation not permitted"</h2><div class="bc"><a href="#home">Home</a> / Troubleshooting / launchd</div>
+<p>macOS privacy restriction.</p>
+<p><strong>Fix:</strong> System Settings → Privacy & Security → Full Disk Access → add <code>/usr/bin/python3</code>.</p>
 </article>
 
-<!-- ──────── REF: COMMANDS ──────── -->
-<article class="page" id="page-ref-commands">
-<h2>📋 Command Cheatsheet</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Reference / Commands</div>
+<!-- CHEATSHEET -->
+<article class="page" id="page-cheatsheet"><div id="edit-cheatsheet" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>📋 Command Cheatsheet</h2><div class="bc"><a href="#home">Home</a> / Reference / Cheatsheet</div>
+<table><tr><th>Task</th><th>Command</th></tr>
+<tr><td>Deploy</td><td><code>python3 ~/Documents/minimax/cc-router/setup.py</code></td></tr>
+<tr><td>Switch to DeepSeek Pro</td><td><code>cc-model pro</code></td></tr>
+<tr><td>Switch to DeepSeek Flash</td><td><code>cc-model flash</code></td></tr>
+<tr><td>Switch to MiniMax</td><td><code>cc-model minimax</code></td></tr>
+<tr><td>Switch to GLM‑5.1</td><td><code>cc-model glm</code></td></tr>
+<tr><td>Show status</td><td><code>cc-model status</code></td></tr>
+<tr><td>Proxy health</td><td><code>curl http://127.0.0.1:3456/health</code></td></tr>
+<tr><td>Model list</td><td><code>curl http://127.0.0.1:3456/v1/models</code></td></tr>
+<tr><td>Restart proxy</td><td><code>lsof -ti :3456 | xargs kill && python3 ~/Documents/minimax/cc-proxy.py &</code></td></tr>
+<tr><td>Test MiniMax</td><td><code>curl -s https://api.minimax.io/anthropic/v1/messages -H "x-api-key: KEY" -H "anthropic-version: 2023-06-01" -d '{"model":"MiniMax-M3","max_tokens":5,"messages":[{"role":"user","content":"hi"}]}'</code></td></tr>
+<tr><td>Check env conflicts</td><td><code>grep ANTHROPIC ~/.zshrc</code></td></tr>
+</table>
+</article>
 
-<div class="grid">
-  <div class="card"><h4>Deploy</h4><pre>python3 ~/Projects/cc-router/setup.py</pre></div>
-  <div class="card"><h4>Switch</h4><pre>cc-model pro|flash|minimax|glm</pre></div>
-  <div class="card"><h4>Status</h4><pre>cc-model status</pre></div>
-  <div class="card"><h4>Proxy health</h4><pre>curl :3456/health</pre></div>
-  <div class="card"><h4>Model list</h4><pre>curl :3456/v1/models</pre></div>
-  <div class="card"><h4>Kill proxy</h4><pre>lsof -ti :3456 | xargs kill</pre></div>
-  <div class="card"><h4>Start proxy</h4><pre>python3 cc-proxy.py &</pre></div>
-  <div class="card"><h4>Test model</h4><pre>curl :3456/v1/messages -d
-'{"model":"...","max_tokens":5,
-"messages":[{"role":"user",
-"content":"hi"}]}'</pre></div>
-  <div class="card"><h4>Check env</h4><pre>grep ANTHROPIC ~/.zshrc</pre></div>
-  <div class="card"><h4>Fix env</h4><pre>sed -i '' 's/^export
-ANTHROPIC_/# export
-ANTHROPIC_/' ~/.zshrc</pre></div>
-  <div class="card"><h4>Claude verify</h4><pre>/status
-/model</pre></div>
-  <div class="card"><h4>GitHub</h4><pre>git clone ...ai-caseylai/
-cc-router.git</pre></div>
+<!-- LINKS -->
+<article class="page" id="page-links"><div id="edit-links" class="edit-btn" onclick="editOnGitHub('index.html')">✏️ Edit</div>
+<h2>🔗 Links</h2><div class="bc"><a href="#home">Home</a> / Reference / Links</div>
+<table><tr><th>Resource</th><th>URL</th></tr>
+<tr><td>CC Router GitHub</td><td><a href="https://github.com/ai-caseylai/cc-router">github.com/ai-caseylai/cc-router</a></td></tr>
+<tr><td>DeepSeek Platform</td><td><a href="https://platform.deepseek.com">platform.deepseek.com</a></td></tr>
+<tr><td>MiniMax Platform</td><td><a href="https://platform.minimaxi.com">platform.minimaxi.com</a></td></tr>
+<tr><td>Zhipu AI (GLM)</td><td><a href="https://open.bigmodel.cn">open.bigmodel.cn</a></td></tr>
+<tr><td>Z.ai (GLM intl)</td><td><a href="https://z.ai">z.ai</a></td></tr>
+<tr><td>Claude Code Docs</td><td><a href="https://docs.anthropic.com/en/docs/claude-code">docs.anthropic.com/claude-code</a></td></tr>
+</table>
+</article>
+
+<!-- NEW PAGE FORM (appears at bottom when creating) -->
+<div class="new-page-form" id="new-page-form">
+  <h3>Create New Page</h3>
+  <input type="text" id="new-title" placeholder="Page title">
+  <textarea id="new-content" placeholder="Page content (Markdown)…"></textarea>
+  <div class="btns">
+    <button onclick="createNewPage()">Create via GitHub</button>
+    <button style="background:var(--border)" onclick="toggleNewPage()">Cancel</button>
+  </div>
+  <p style="font-size:.75rem;color:var(--muted);margin-top:6px">Opens GitHub's new file form. You must be logged into GitHub.</p>
 </div>
-</article>
-
-<!-- ──────── REF: LINKS ──────── -->
-<article class="page" id="page-ref-links">
-<h2>🔗 Links</h2>
-<div class="breadcrumb"><a href="#home" onclick="showPage('home')">Home</a> / Reference / Links</div>
-
-<h3>Project</h3>
-<ul style="margin-left:20px;margin-bottom:16px">
-  <li><a href="https://github.com/ai-caseylai/cc-router">GitHub Repo</a></li>
-  <li><a href="https://housekeeping.techforliving.net">Wiki (this site)</a></li>
-</ul>
-
-<h3>API Platforms</h3>
-<ul style="margin-left:20px;margin-bottom:16px">
-  <li><a href="https://platform.deepseek.com">DeepSeek Platform</a></li>
-  <li><a href="https://platform.minimaxi.com">MiniMax Platform</a></li>
-  <li><a href="https://open.bigmodel.cn">Zhipu AI (GLM)</a></li>
-</ul>
-
-<h3>Endpoints</h3>
-<table>
-  <tr><th>Provider</th><th>Anthropic‑Compatible Endpoint</th></tr>
-  <tr><td>DeepSeek</td><td><code>https://api.deepseek.com/anthropic/v1/messages</code></td></tr>
-  <tr><td>MiniMax</td><td><code>https://api.minimax.io/anthropic/v1/messages</code></td></tr>
-  <tr><td>GLM‑5.1</td><td><code>https://api.z.ai/api/anthropic/v1/messages</code></td></tr>
-</ul>
-
-<h3>Claude Code</h3>
-<ul style="margin-left:20px">
-  <li><a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code Docs</a></li>
-  <li><a href="https://github.com/ai-caseylai/cc-router">CC Router (this project)</a></li>
-</ul>
-</article>
 
 </main>
 
 <script>
-// ── Page switching ──
-function showPage(id) {
+// ── Navigation ──
+function navTo(name) {
+  window.location.hash = name;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const page = document.getElementById('page-' + id);
-  if (page) page.classList.add('active');
-
-  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('#sidebar .active').forEach(a => a.classList.remove('active'));
+  const link = document.querySelector(`#sidebar a[href="#${name}"]`);
   if (link) link.classList.add('active');
-
-  // Expand parent nav group
-  const group = link ? link.closest('.nav-group') : null;
-  if (group) group.classList.remove('collapsed');
-
   document.getElementById('content').scrollTop = 0;
-  window.scrollTo(0, 0);
-
-  // Update URL hash
-  if (id === 'home') {
-    history.replaceState(null, '', '#');
-  } else {
-    history.replaceState(null, '', '#' + id);
-  }
-
-  // Close mobile sidebar
   document.getElementById('sidebar').classList.remove('open');
+  updateEditButtons();
+}
+
+function showPage(name) { window.location.hash = name; navTo(name); }
+function loadFromHash() {
+  const h = window.location.hash.replace('#','');
+  if (h && document.getElementById('page-'+h)) navTo(h);
 }
 
 // ── Search ──
-function searchWiki(query) {
-  if (!query || query.length < 2) {
-    // Reset: show all links
-    document.querySelectorAll('.nav-links li').forEach(li => li.style.display = '');
-    document.querySelectorAll('.nav-group').forEach(g => {
-      if (query === '') g.classList.remove('collapsed');
-    });
-    return;
-  }
-
-  const q = query.toLowerCase();
-  document.querySelectorAll('.nav-links li').forEach(li => {
-    const text = li.textContent.toLowerCase();
-    li.style.display = text.includes(q) ? '' : 'none';
+function searchWiki(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('.ng').forEach(g => g.classList.toggle('collapsed', q !== ''));
+  if (!q) { document.querySelectorAll('.ng-links li').forEach(l => l.style.display=''); return; }
+  document.querySelectorAll('.ng-links li').forEach(li => {
+    li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
-  // Expand all groups
-  document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('collapsed'));
+  document.querySelectorAll('.ng').forEach(g => g.classList.remove('collapsed'));
 }
 
-// ── Load page from URL hash ──
-function loadFromHash() {
-  const hash = window.location.hash.replace('#', '');
-  if (hash && document.getElementById('page-' + hash)) {
-    showPage(hash);
+// ── Auth ──
+const WIKI_PASS = 'cc-router-2026'; // Change this password
+let isEditor = localStorage.getItem('cc-wiki-editor') === 'true';
+
+function toggleLogin() {
+  if (isEditor) { logout(); return; }
+  document.getElementById('login-modal').classList.add('open');
+  document.getElementById('login-err').textContent = '';
+}
+
+function doLogin() {
+  const pw = document.getElementById('login-pass').value;
+  if (pw === WIKI_PASS) {
+    isEditor = true;
+    localStorage.setItem('cc-wiki-editor', 'true');
+    document.getElementById('login-modal').classList.remove('open');
+    document.getElementById('login-pass').value = '';
+    updateEditButtons();
+    document.getElementById('btn-login').textContent = '🔓 Logout';
+    document.getElementById('btn-login').classList.add('editing');
+    document.getElementById('edit-indicator').classList.add('show');
+  } else {
+    document.getElementById('login-err').textContent = 'Wrong password';
   }
 }
 
-window.addEventListener('hashchange', loadFromHash);
-window.addEventListener('DOMContentLoaded', loadFromHash);
+function logout() {
+  isEditor = false;
+  localStorage.removeItem('cc-wiki-editor');
+  document.getElementById('btn-login').textContent = '🔒 Login';
+  document.getElementById('btn-login').classList.remove('editing');
+  document.getElementById('edit-indicator').classList.remove('show');
+  updateEditButtons();
+}
 
-// ── Keyboard shortcut ──
+function updateEditButtons() {
+  document.querySelectorAll('.edit-btn').forEach(b => b.classList.toggle('show', isEditor));
+  document.querySelectorAll('.new-page').forEach(b => b.classList.toggle('show', isEditor));
+}
+
+// ── Edit on GitHub ──
+const REPO = 'ai-caseylai/cc-router';
+function editOnGitHub(file) {
+  window.open(`https://github.com/${REPO}/edit/main/${file}`, '_blank');
+}
+
+// ── New Page ──
+function toggleNewPage() {
+  document.getElementById('new-page-form').classList.toggle('open');
+}
+function createNewPage() {
+  const title = document.getElementById('new-title').value.trim();
+  const content = document.getElementById('new-content').value.trim();
+  if (!title) return alert('Enter a page title');
+  const filename = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.md';
+  const body = `# ${title}\n\n${content}`;
+  // Open GitHub's new file form
+  const url = `https://github.com/${REPO}/new/main?filename=wiki/${filename}&value=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+  document.getElementById('new-page-form').classList.remove('open');
+  document.getElementById('new-title').value = '';
+  document.getElementById('new-content').value = '';
+}
+
+// ── Init ──
+window.addEventListener('hashchange', loadFromHash);
+window.addEventListener('DOMContentLoaded', () => {
+  loadFromHash();
+  if (isEditor) {
+    document.getElementById('btn-login').textContent = '🔓 Logout';
+    document.getElementById('btn-login').classList.add('editing');
+    document.getElementById('edit-indicator').classList.add('show');
+    updateEditButtons();
+  }
+});
 document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
     e.preventDefault();
-    document.getElementById('sidebar-search').focus();
+    document.getElementById('search').focus();
   }
 });
 </script>
