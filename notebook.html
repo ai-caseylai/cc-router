@@ -1,1 +1,327 @@
-[…shrunk: 35538 chars, 839 lines — tool already responded, see result]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CC Notebook — Collaborative AI Knowledge Base</title>
+<style>
+:root {
+  --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#c9d1d9;
+  --muted:#8b949e; --accent:#58a6ff; --green:#3fb950; --red:#f85149;
+  --yellow:#d2991d; --code:#1c2128; --sidebar-w:280px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:'SF Mono',monospace;font-size:.85em;background:var(--code);padding:1px 5px;border-radius:3px}
+pre{background:var(--code);border:1px solid var(--border);border-radius:6px;padding:14px 18px;overflow-x:auto;font-size:.84rem;line-height:1.5;margin:12px 0}
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)}
+th{font-weight:600;color:var(--muted);font-size:.78rem;text-transform:uppercase}
+
+/* Sidebar */
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:#0f131a;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto;z-index:10}
+.sb-hdr{padding:18px 20px 12px;border-bottom:1px solid var(--border)}
+.sb-hdr h1{font-size:1.1rem;margin-bottom:2px}
+.sb-hdr p{font-size:.75rem;color:var(--muted)}
+#note-list{flex:1;overflow-y:auto;padding:8px 0}
+.note-item{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;cursor:pointer;font-size:.85rem;border-left:2px solid transparent;transition:background .12s}
+.note-item:hover{background:var(--card)}
+.note-item.active{border-left-color:var(--accent);color:var(--accent);background:rgba(88,166,255,.06)}
+.note-item .del{opacity:0;color:var(--red);background:none;border:none;cursor:pointer;font-size:.9rem;padding:2px 6px;border-radius:4px}
+.note-item:hover .del{opacity:1}
+.note-item .del:hover{background:rgba(248,81,73,.15)}
+.tag{font-size:.65rem;padding:1px 6px;border-radius:8px;margin-left:6px;background:rgba(63,185,80,.12);color:var(--green)}
+.sb-actions{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px}
+.btn{padding:7px 16px;border-radius:6px;font-size:.82rem;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text);transition:all .15s}
+.btn:hover{background:#1f2937}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.btn.danger{color:var(--red)}
+.btn.sm{padding:4px 10px;font-size:.75rem}
+.sb-footer{padding:10px 20px;border-top:1px solid var(--border);font-size:.72rem;color:var(--muted)}
+
+/* Main */
+main{flex:1;min-width:0;display:flex;flex-direction:column;max-height:100vh}
+#toolbar{display:flex;align-items:center;gap:8px;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--bg)}
+#toolbar input[type=text]{flex:1;padding:8px 12px;background:var(--code);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.92rem;outline:none}
+#toolbar input:focus{border-color:var(--accent)}
+#editor-wrap{flex:1;display:flex;overflow:hidden}
+#editor{flex:1;padding:24px 32px;background:transparent;border:none;color:var(--text);font-family:'SF Mono',monospace;font-size:.9rem;line-height:1.7;resize:none;outline:none;overflow-y:auto}
+#preview{flex:1;padding:24px 32px;overflow-y:auto;border-left:1px solid var(--border);display:none}
+#preview h1,#preview h2,#preview h3{margin:16px 0 8px}
+#preview p{margin:6px 0;line-height:1.65}
+#preview blockquote{border-left:3px solid var(--yellow);margin:8px 0;padding:4px 16px;color:var(--muted)}
+#status{font-size:.78rem;color:var(--muted);padding:6px 24px;border-top:1px solid var(--border)}
+
+/* AI Panel */
+#ai-panel{position:fixed;right:-420px;top:0;width:400px;height:100vh;background:var(--card);border-left:1px solid var(--border);z-index:20;transition:right .25s;display:flex;flex-direction:column}
+#ai-panel.open{right:0}
+#ai-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+#ai-hdr h3{font-size:.95rem}
+#ai-msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{padding:10px 14px;border-radius:8px;font-size:.85rem;line-height:1.5;max-width:90%}
+.ai-msg.user{align-self:flex-end;background:var(--accent);color:#000}
+.ai-msg.agent{align-self:flex-start;background:var(--code);border:1px solid var(--border)}
+#ai-input-wrap{display:flex;padding:12px 16px;border-top:1px solid var(--border);gap:8px}
+#ai-input{flex:1;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);outline:none}
+#ai-input:focus{border-color:var(--accent)}
+.ai-loading{color:var(--muted);font-style:italic;font-size:.8rem}
+
+/* Mobile */
+@media(max-width:768px){
+  #sidebar{position:fixed;left:-300px;transition:left .25s}
+  #sidebar.open{left:0}
+  main{padding:0}
+  #editor-wrap{flex-direction:column}
+  #preview{border-left:none;border-top:1px solid var(--border)}
+  #ai-panel{width:100vw;right:-100vw}
+}
+#menu-btn{display:none;position:fixed;top:12px;left:12px;z-index:25;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:1.2rem;padding:6px 10px;border-radius:6px;cursor:pointer}
+@media(max-width:768px){#menu-btn{display:block}}
+</style>
+</head>
+<body>
+<button id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sb-hdr">
+    <h1>📓 CC Notebook</h1>
+    <p>Collaborative AI Knowledge Base</p>
+  </div>
+  <div id="note-list"></div>
+  <div class="sb-actions">
+    <button class="btn primary" onclick="newNote()" title="New Note (Ctrl+N)">+ New Note</button>
+    <button class="btn" onclick="document.getElementById('ai-panel').classList.toggle('open')" title="AI Q&A (Ctrl+J)">🤖 Ask AI</button>
+  </div>
+  <div class="sb-footer">
+    <span id="user-info">🔒 Read-only</span> · 
+    <a href="#" onclick="promptLogin()">Login</a> · 
+    <a href="https://github.com/ai-caseylai/cc-router">GitHub</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+  <div id="toolbar">
+    <input type="text" id="title-input" placeholder="Note title…" oninput="autoSave()">
+    <input type="text" id="tag-input" placeholder="tags (comma)" onchange="autoSave()" style="max-width:180px">
+    <button class="btn sm" onclick="togglePreview()">👁 Preview</button>
+    <button class="btn sm" onclick="exportNote()">⬇ Export</button>
+  </div>
+  <div id="editor-wrap">
+    <textarea id="editor" placeholder="Write in Markdown…&#10;&#10;# Heading&#10;Your content here.&#10;&#10;> Blockquote&#10;&#10;- List item&#10;&#10;`code`" oninput="autoSave()"></textarea>
+    <div id="preview"></div>
+  </div>
+  <div id="status">Ready</div>
+</main>
+
+<!-- AI PANEL -->
+<div id="ai-panel">
+  <div id="ai-hdr">
+    <h3>🤖 AI Assistant</h3>
+    <button class="btn sm" onclick="document.getElementById('ai-panel').classList.remove('open')">✕</button>
+  </div>
+  <div id="ai-msgs"><div class="ai-msg agent">Ask me anything about CC Router, Claude Code, or the notes. I use your configured LLM proxy.</div></div>
+  <div id="ai-input-wrap">
+    <input type="text" id="ai-input" placeholder="Ask about these notes…" onkeydown="if(event.key==='Enter')askAI()">
+    <button class="btn primary sm" onclick="askAI()">Send</button>
+  </div>
+</div>
+
+<script>
+// ═══════════ CONFIG ═══════════
+const REPO = 'ai-caseylai/cc-router';
+const NOTES_PATH = 'docs/notebook';
+const WIKI_PASS = 'cc-router-admin'; // change this
+const PROXY_URL = 'http://127.0.0.1:3456/v1/messages';
+
+// ═══════════ STATE ═══════════
+let notes = JSON.parse(localStorage.getItem('cc_notebook_notes') || '[]');
+let currentId = null;
+let isLoggedIn = localStorage.getItem('cc_notebook_auth') === '1';
+let saveTimer = null;
+let previewOn = false;
+
+// ═══════════ AUTH ═══════════
+function promptLogin(){
+  const pw = prompt('Enter notebook password:');
+  if(pw === WIKI_PASS){ isLoggedIn = true; localStorage.setItem('cc_notebook_auth','1'); updateUI(); setStatus('✅ Logged in'); }
+  else if(pw) alert('Wrong password.');
+}
+function updateUI(){
+  document.getElementById('user-info').textContent = isLoggedIn ? '✏️ Editing' : '🔒 Read-only';
+  document.getElementById('editor').readOnly = !isLoggedIn;
+  document.getElementById('title-input').readOnly = !isLoggedIn;
+  document.getElementById('tag-input').readOnly = !isLoggedIn;
+  document.querySelectorAll('.del').forEach(b=>b.style.display=isLoggedIn?'':'none');
+}
+updateUI();
+
+// ═══════════ NOTES CRUD ═══════════
+function newNote(){
+  if(!isLoggedIn) return promptLogin();
+  const note = {id:'n'+Date.now(),title:'Untitled',content:'',tags:[],created:new Date().toISOString(),modified:new Date().toISOString()};
+  notes.unshift(note);
+  saveNotes(); renderNotes(); selectNote(note.id);
+  document.getElementById('title-input').focus();
+}
+function selectNote(id){
+  currentId = id;
+  const note = notes.find(n=>n.id===id);
+  if(!note) return;
+  document.getElementById('title-input').value = note.title;
+  document.getElementById('tag-input').value = (note.tags||[]).join(', ');
+  document.getElementById('editor').value = note.content || '';
+  updatePreview();
+  renderNotes();
+}
+function deleteNote(id){
+  if(!isLoggedIn||!confirm('Delete this note?')) return;
+  notes = notes.filter(n=>n.id!==id);
+  if(currentId===id){ currentId=null; document.getElementById('title-input').value=''; document.getElementById('editor').value=''; document.getElementById('tag-input').value=''; }
+  saveNotes(); renderNotes();
+}
+function autoSave(){
+  if(!currentId) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    const note = notes.find(n=>n.id===currentId);
+    if(!note) return;
+    note.title = document.getElementById('title-input').value || 'Untitled';
+    note.content = document.getElementById('editor').value;
+    note.tags = document.getElementById('tag-input').value.split(',').map(t=>t.trim()).filter(Boolean);
+    note.modified = new Date().toISOString();
+    saveNotes(); renderNotes(); updatePreview();
+    setStatus('💾 Saved');
+  }, 600);
+}
+function saveNotes(){ localStorage.setItem('cc_notebook_notes', JSON.stringify(notes)); }
+function setStatus(msg){ document.getElementById('status').textContent = msg; setTimeout(()=>{if(document.getElementById('status').textContent===msg)document.getElementById('status').textContent='Ready'},3000); }
+
+// ═══════════ RENDER ═══════════
+function renderNotes(){
+  const list = document.getElementById('note-list');
+  list.innerHTML = notes.map(n=>`
+    <div class="note-item${n.id===currentId?' active':''}" onclick="selectNote('${n.id}')">
+      <span>${esc(n.title)} ${(n.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</span>
+      ${isLoggedIn?`<button class="del" onclick="event.stopPropagation();deleteNote('${n.id}')">🗑</button>`:''}
+    </div>
+  `).join('');
+  if(!notes.length) list.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:.85rem">No notes yet. Click "+ New Note" to start.</div>';
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══════════ PREVIEW ═══════════
+function togglePreview(){
+  previewOn = !previewOn;
+  document.getElementById('preview').style.display = previewOn ? 'block' : 'none';
+  document.getElementById('editor').style.display = previewOn ? 'none' : 'block';
+  if(previewOn) updatePreview();
+}
+function updatePreview(){
+  const md = document.getElementById('editor').value;
+  document.getElementById('preview').innerHTML = renderMD(md);
+}
+function renderMD(md){
+  return md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2">$1</a>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>')
+    .replace(/^(.+)$/gm,'<p>$1</p>');
+}
+
+// ═══════════ AI Q&A ═══════════
+async function askAI(){
+  const input = document.getElementById('ai-input');
+  const q = input.value.trim();
+  if(!q) return;
+  const msgs = document.getElementById('ai-msgs');
+  msgs.innerHTML += `<div class="ai-msg user">${esc(q)}</div>`;
+  input.value = '';
+  
+  // Build context from notes
+  const ctx = notes.map(n=>`### ${n.title}\n${n.content}`).join('\n\n').substring(0, 8000);
+  
+  const loader = document.createElement('div');
+  loader.className = 'ai-msg agent ai-loading';
+  loader.textContent = 'Thinking…';
+  msgs.appendChild(loader);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const resp = await fetch(PROXY_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':'x','anthropic-version':'2023-06-01'},
+      body:JSON.stringify({
+        model:'deepseek-v4-flash',
+        max_tokens:600,
+        system:`You are a helpful AI assistant for a collaborative notebook. Answer based on the notebook content below. If the answer isn't in the notes, use your general knowledge. Be concise.\n\nNOTEBOOK CONTENT:\n${ctx}`,
+        messages:[{role:'user',content:q}]
+      })
+    });
+    const data = await resp.json();
+    loader.remove();
+    const text = data.content?.[0]?.text || 'No response. Is cc-proxy running?';
+    msgs.innerHTML += `<div class="ai-msg agent">${renderMD(text)}</div>`;
+  } catch(e){
+    loader.remove();
+    msgs.innerHTML += `<div class="ai-msg agent" style="color:var(--red)">Error: cc-proxy not reachable. Start it: <code>python3 ~/Documents/minimax/cc-proxy.py &amp;</code></div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ═══════════ EXPORT ═══════════
+function exportNote(){
+  const note = notes.find(n=>n.id===currentId);
+  if(!note) return;
+  const md = `# ${note.title}\n\n> tags: ${(note.tags||[]).join(', ')}\n> modified: ${note.modified}\n\n${note.content}`;
+  const blob = new Blob([md],{type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (note.title||'note').replace(/\s+/g,'_')+'.md';
+  a.click();
+}
+
+// ═══════════ SYNC TO GITHUB ═══════════
+async function syncToGitHub(){
+  if(!isLoggedIn) return;
+  const token = localStorage.getItem('cc_gh_token');
+  if(!token){ setStatus('⚠️ Set GitHub token: localStorage cc_gh_token'); return; }
+  for(const note of notes){
+    const md = `# ${note.title}\n\n> tags: ${(note.tags||[]).join(', ')}\n> modified: ${note.modified}\n\n${note.content}`;
+    const path = `${NOTES_PATH}/${(note.title||'untitled').replace(/[^a-zA-Z0-9_-]/g,'_')}.md`;
+    try{
+      // Check if file exists
+      const getResp = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{headers:{Authorization:`Bearer ${token}`}});
+      const sha = getResp.ok ? (await getResp.json()).sha : null;
+      const body = JSON.stringify({message:`Update ${note.title}`,content:btoa(unescape(encodeURIComponent(md))),sha, branch:'main'});
+      await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,{method:'PUT',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body});
+    }catch(e){ console.error('Sync failed for', note.title, e); }
+  }
+  setStatus('☁️ Synced to GitHub');
+}
+
+// ═══════════ KEYBOARD ═══════════
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='n'){ e.preventDefault(); newNote(); }
+  if((e.metaKey||e.ctrlKey)&&e.key==='j'){ e.preventDefault(); document.getElementById('ai-panel').classList.toggle('open'); }
+  if((e.metaKey||e.ctrlKey)&&e.key==='s'){ e.preventDefault(); syncToGitHub(); }
+  if((e.metaKey||e.ctrlKey)&&e.key==='p'){ e.preventDefault(); togglePreview(); }
+});
+
+renderNotes();
+if(notes.length) selectNote(notes[0].id);
+</script>
+</body>
+</html>
