@@ -12,7 +12,7 @@ You are a CC Router deployment expert. CC Router is a lightweight Python proxy t
 ```
 Claude Code → cc-proxy :3456 → api.minimax.io      (MiniMax M3)
                               → api.deepseek.com    (DeepSeek Pro/Flash)
-                              → open.bigmodel.cn    (GLM-5.1)
+                              → api.z.ai            (GLM-5.1 · intl)
 ```
 
 ## Key Files

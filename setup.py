@@ -160,12 +160,12 @@ def deploy_proxy():
     if GLM_API_KEY and "YOUR" not in GLM_API_KEY:
         glm_provider = """,
     "glm-5.1": {
-        "url": "https://open.bigmodel.cn/api/anthropic/v1/messages",
+        "url": "https://api.z.ai/api/anthropic/v1/messages",
         "key": \"""" + GLM_API_KEY + """\",
     },"""
         glm_block = '''
-# GLM-5.1 已啟用
-''' + f'PROVIDERS["glm-5.1"] = PROVIDERS.get("glm-5.1", {{"url": "https://open.bigmodel.cn/api/anthropic/v1/messages", "key": "{GLM_API_KEY}"}})'
+# GLM-5.1 已啟用（國際端點 api.z.ai）
+''' + f'PROVIDERS["glm-5.1"] = PROVIDERS.get("glm-5.1", {{"url": "https://api.z.ai/api/anthropic/v1/messages", "key": "{GLM_API_KEY}"}})'
 
     proxy_code = textwrap.dedent(f'''\
 #!/usr/bin/env python3
