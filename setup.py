@@ -43,6 +43,7 @@ from pathlib import Path
 
 MINIMAX_API_KEY = "sk-cp-YOUR_MINIMAX_KEY"
 DEEPSEEK_API_KEY = "sk-YOUR_DEEPSEEK_KEY"
+GLM_API_KEY = ""  # 選填：智譜 GLM-5.1 Key（留空則不啟用）
 
 # ═══════════════════════════════════════════════════════════════════════
 # 路徑
@@ -152,6 +153,19 @@ def deploy_proxy():
     section("3/6 部署 cc-proxy 路由器")
 
     PROXY_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    # 動態生成 GLM provider（如果有 Key）
+    glm_provider = ""
+    glm_block = ""
+    if GLM_API_KEY and "YOUR" not in GLM_API_KEY:
+        glm_provider = """,
+    "glm-5.1": {
+        "url": "https://open.bigmodel.cn/api/anthropic/v1/messages",
+        "key": \"""" + GLM_API_KEY + """\",
+    },"""
+        glm_block = '''
+# GLM-5.1 已啟用
+''' + f'PROVIDERS["glm-5.1"] = PROVIDERS.get("glm-5.1", {{"url": "https://open.bigmodel.cn/api/anthropic/v1/messages", "key": "{GLM_API_KEY}"}})'
 
     proxy_code = textwrap.dedent(f'''\
 #!/usr/bin/env python3

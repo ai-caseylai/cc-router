@@ -28,12 +28,25 @@ Claude Code → cc-proxy :3456 → api.minimax.io (MiniMax M3)
 
 ### 場景 A：首次部署
 
-如果用戶要從零開始設定：
+如果用戶要從零開始設定，**第一步必須先詢問 API Keys**：
+
+#### 🔑 先向用戶索取以下 Keys（缺一不可）：
+
+| Provider | 獲取網址 | Key 格式 | 用途 |
+|----------|---------|---------|------|
+| **DeepSeek** | [platform.deepseek.com](https://platform.deepseek.com) → API Keys | `sk-xxxxxxxx` | DeepSeek Pro + Flash |
+| **MiniMax** | [platform.minimaxi.com](https://platform.minimaxi.com) → API Keys | `sk-cp-xxxxxxxx` | MiniMax M3 |
+| **GLM-5** | [open.bigmodel.cn](https://open.bigmodel.cn) → API Keys | 含 `.` 分隔符 | 智譜 GLM-5.1（選填） |
+
+> ⚠️ 如果用戶說「沒有」、「不知道」、「忘記了」，指引他們去對應平台申請，**不要跳過這步**。
+
+#### 拿到 Keys 後執行部署：
 
 ```bash
-# 1. 編輯 setup.py，填入 API Keys
-#    MINIMAX_API_KEY = "sk-cp-..."
-#    DEEPSEEK_API_KEY = "sk-..."
+# 1. 將 Keys 寫入 setup.py 頂部
+sed -i '' 's/sk-cp-YOUR_MINIMAX_KEY/用戶給的MiniMax_Key/' ~/Documents/minimax/cc-router/setup.py
+sed -i '' 's/sk-YOUR_DEEPSEEK_KEY/用戶給的DeepSeek_Key/' ~/Documents/minimax/cc-router/setup.py
+# （如果用戶給了 GLM Key，手動加到 cc-proxy.py 的 PROVIDERS）
 
 # 2. 一鍵部署
 python3 ~/Documents/minimax/cc-router/setup.py
